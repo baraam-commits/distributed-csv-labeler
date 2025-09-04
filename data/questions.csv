@@ -1,0 +1,813 @@
+text,
+ i need you to draft an email to invite my friends to a birthday party. <ENT> </ENT>,0
+" what does the acronym faq stand for? <ENT> entity: FAQ, type: ORG </ENT>",0
+ what is the incubation period of the ebola virus? <ENT> </ENT>,1
+ how do prose and poetry differ? <ENT> </ENT>,0
+" how many moons does mars have? <ENT> entity: Mars, type: LOC </ENT>",1
+ how can i improve my resume? <ENT> </ENT>,0
+" what is the currency of chile? <ENT> entity: Chile, type: GPE </ENT>",1
+ explain the process of photosynthesis. <ENT> </ENT>,0
+" who is the current governor of california? <ENT> entity: California, type: GPE </ENT>",1
+ what is the chemical formula for water? <ENT> </ENT>,0
+ how many elements are in the periodic table? <ENT> </ENT>,1
+" what is the capital of oman? <ENT> entity: Oman, type: GPE </ENT>",1
+ list the first 10 elements of the periodic table. <ENT> </ENT>,1
+" what is the largest ocean on earth? <ENT> entity: Earth, type: LOC </ENT>",0
+" what is the capital city of japan? <ENT> entity: Japan, type: GPE </ENT>",0
+" who is thor in norse mythology? <ENT> entity: Norse, type: ORG </ENT>",0
+ summarize the main points of the us constitution. <ENT> </ENT>,0
+ what is the recommended adult dosage of ibuprofen for a headache? <ENT> </ENT>,1
+ can you tell me how to stop procrastinating? <ENT> </ENT>,0
+" how many continents are there on earth? <ENT> entity: Earth, type: LOC </ENT>",0
+" how do i create a pivot table in excel? <ENT> entity: Excel, type: PRODUCT </ENT>",0
+" i 'm wondering what the capital of peru is? <ENT> entity: Peru, type: GPE </ENT>",1
+ explain plate tectonics in simple terms. <ENT> </ENT>,0
+" i want to know what the capital of kyrgyzstan is. <ENT> entity: Kyrgyzstan, type: GPE </ENT>",1
+" what is the current unemployment rate in the us? <ENT> entity: US, type: GPE </ENT>",1
+ could you explain the concept of dna replication? <ENT> </ENT>,0
+ how can i cope with stress? <ENT> </ENT>,0
+" what is the currency of canada? <ENT> entity: Canada, type: GPE </ENT>",0
+" what is the capital of zambia? <ENT> entity: Zambia, type: GPE </ENT>",1
+" what is the capital of cambodia? <ENT> entity: Cambodia, type: GPE </ENT>",1
+" what is the hardest natural substance on earth? <ENT> entity: Earth, type: LOC </ENT>",0
+" explain liebig 's law of the minimum. <ENT> entity: Explain Liebig's, type: ORG </ENT>",1
+ how do i format a hard drive? <ENT> </ENT>,0
+" what are the new changes in the tax law for 2023? <ENT> entity: 2023, type: DATE </ENT>",1
+ how many symphonies did beethoven compose? <ENT> </ENT>,1
+" what is the smallest country in asia? <ENT> entity: Asia, type: LOC </ENT>",1
+ how do i convert 100 ° f to celsius? <ENT> </ENT>,0
+" who won the nobel prize in literature in 2020? <ENT> entity: the Nobel Prize in Literature, type: WORK_OF_ART; entity: 2020, type: DATE </ENT>",1
+ i 'm wondering how photosynthesis works? <ENT> </ENT>,0
+ what does http 404 error mean? <ENT> </ENT>,0
+" who wrote"" to kill a mockingbird""? <ENT> </ENT>",0
+ how can i save money on groceries? <ENT> </ENT>,0
+" draft an email to my boss asking for a day off. <ENT> entity: a day, type: DATE </ENT>",0
+ how do i improve my public speaking skills? <ENT> </ENT>,0
+ i 'm curious about the anthropic principle in cosmology. what is it? <ENT> </ENT>,1
+" what is the population of dubai? <ENT> entity: Dubai, type: GPE </ENT>",1
+" summarize the plot of the movie"" the seventh seal"". <ENT> entity: The Seventh Seal, type: WORK_OF_ART </ENT>",1
+ list some successful guerrilla marketing examples. <ENT> </ENT>,1
+" how many people have walked on the moon? <ENT> entity: Moon, type: PERSON </ENT>",1
+ explain quantum entanglement. <ENT> </ENT>,1
+ how does photosynthesis work? <ENT> </ENT>,0
+" what is the capital of rwanda? <ENT> entity: Rwanda, type: GPE </ENT>",1
+" who is ada lovelace? <ENT> entity: Ada Lovelace, type: PERSON </ENT>",1
+" what is the largest animal( by weight) on earth? <ENT> entity: Earth, type: LOC </ENT>",0
+ i need you to write a short story about an ancient forest. <ENT> </ENT>,0
+" name the capital of germany. <ENT> entity: Germany, type: GPE </ENT>",0
+" who is the current ceo of google? <ENT> entity: Google, type: ORG </ENT>",1
+ could you explain what quantum mechanics is in simple terms? <ENT> </ENT>,0
+" what is the meaning of the foreign word"" hola"" in english? <ENT> entity: English, type: LANGUAGE </ENT>",0
+" what does the acronym nasa stand for? <ENT> entity: NASA, type: ORG </ENT>",0
+ explain the concept of supply- side economics. <ENT> </ENT>,1
+ could you tell me how to improve my handwriting? <ENT> </ENT>,0
+ how do i change a flat tire on my car? <ENT> </ENT>,0
+" who was the first person to walk on the moon? <ENT> entity: Moon, type: PERSON </ENT>",0
+ what is the chemical name of vitamin c? <ENT> </ENT>,1
+" who was the first person to climb mount everest? <ENT> entity: Mount Everest, type: LOC </ENT>",0
+" what is the capital of belarus? <ENT> entity: Belarus, type: GPE </ENT>",1
+" who painted the mona lisa? <ENT> entity: the Mona Lisa, type: WORK_OF_ART </ENT>",0
+ write a poem about friendship. <ENT> </ENT>,0
+ could you write a poem about the sea? <ENT> </ENT>,0
+ what is the second largest country in the world? <ENT> </ENT>,1
+" what is the population of nigeria? <ENT> entity: Nigeria, type: GPE </ENT>",1
+ i want to know the population of the world right now. <ENT> </ENT>,1
+ explain how blockchain consensus algorithms work. <ENT> </ENT>,1
+" who was the first president of the united states? <ENT> entity: the United States, type: GPE </ENT>",0
+" what year did the titanic sink? <ENT> entity: Titanic, type: ORG </ENT>",1
+ what are the differences between mitosis and meiosis? <ENT> </ENT>,0
+" what is the current population of tokyo? <ENT> entity: Tokyo, type: GPE </ENT>",1
+" what does"" bonjour"" mean in english? <ENT> entity: Bonjour, type: WORK_OF_ART; entity: English, type: LANGUAGE </ENT>",0
+" how many letters are in the english alphabet? <ENT> entity: English, type: LANGUAGE </ENT>",0
+" who is the author of"" pride and prejudice""? <ENT> entity: Pride and Prejudice, type: WORK_OF_ART </ENT>",0
+ who invented the ballpoint pen? <ENT> </ENT>,1
+ explain the big bang theory. <ENT> </ENT>,0
+" who is the greek god of war? <ENT> entity: Greek, type: NORP </ENT>",0
+ what is the medical term for high blood sugar? <ENT> </ENT>,1
+ how do i boil an egg? <ENT> </ENT>,0
+" could you tell me who nikola tesla was? <ENT> entity: Nikola Tesla, type: PRODUCT </ENT>",1
+" how are you feeling today? <ENT> entity: today, type: DATE </ENT>",0
+ explain the principles of utilitarianism in ethics. <ENT> </ENT>,1
+ what 's 15 % of 200? <ENT> </ENT>,0
+ explain the immune system. <ENT> </ENT>,0
+" what does opec stand for? <ENT> entity: OPEC, type: ORG </ENT>",0
+ who discovered penicillin? <ENT> </ENT>,0
+" who is the current king of spain? <ENT> entity: Spain, type: GPE </ENT>",1
+ how can i improve my time management skills? <ENT> </ENT>,0
+" who directed the film"" parasite""? <ENT> </ENT>",1
+" i have a question: what is the capital of cyprus? <ENT> entity: Cyprus, type: LOC </ENT>",1
+" if a train leaves at 3 private message and arrives at 5 private message, how long is the journey? <ENT> </ENT>",0
+ what are some ways to stop procrastinating? <ENT> </ENT>,0
+ what is the boiling point of water in degrees celsius? <ENT> </ENT>,0
+" what is the population of singapore? <ENT> entity: Singapore, type: GPE </ENT>",1
+" who is the current prime minister of the uk? <ENT> entity: UK, type: GPE </ENT>",1
+" what are the requirements to obtain a driver 's license in california? <ENT> entity: California, type: GPE </ENT>",1
+" who is the current prime minister of malta? <ENT> entity: Malta, type: GPE </ENT>",1
+ what is the theory of relativity? <ENT> </ENT>,0
+ what are the side effects of metformin? <ENT> </ENT>,1
+ explain the process of mitosis. <ENT> </ENT>,0
+" what does usb stand for? <ENT> entity: USB, type: ORG </ENT>",0
+ explain the theory of plate tectonics. <ENT> </ENT>,0
+ explain how electricity works. <ENT> </ENT>,0
+" who painted"" guernica""? <ENT> entity: Guernica, type: WORK_OF_ART </ENT>",0
+" who is the current prime minister of new zealand? <ENT> entity: New Zealand, type: GPE </ENT>",1
+ who invented the television? <ENT> </ENT>,1
+ explain the monty hall problem. <ENT> </ENT>,0
+ how do i increase my productivity at work? <ENT> </ENT>,0
+ how can i manage my anxiety before an exam? <ENT> </ENT>,0
+ what is the largest country by area? <ENT> </ENT>,0
+" i have a question: could you tell me the capital of barbados? <ENT> entity: Barbados, type: GPE </ENT>",1
+" what is the pythagorean theorem? <ENT> entity: Pythagorean, type: NORP </ENT>",0
+" who is the current secretary- general of the united nations? <ENT> entity: the United Nations, type: ORG </ENT>",1
+ explain how photosynthesis works in plants. <ENT> </ENT>,0
+ what 's the currency of the uae? <ENT> </ENT>,1
+ what is the time complexity of binary search? <ENT> </ENT>,0
+ what is the population of the world right now? <ENT> </ENT>,1
+" who is rosalind franklin? <ENT> entity: Rosalind Franklin, type: PERSON </ENT>",1
+" what is the difference between ipv4 and ipv6? <ENT> entity: IPv4, type: ORG </ENT>",1
+ how can i stop procrastinating? <ENT> </ENT>,0
+" explain the concept of neural networks in ai. <ENT> entity: AI, type: GPE </ENT>",1
+" explain the concept of derrida 's deconstruction. <ENT> entity: Derrida, type: GPE </ENT>",1
+" i 'm wondering what the capital of chile is? <ENT> entity: Chile, type: GPE </ENT>",1
+" i have a question: who is the current president of france? <ENT> entity: France, type: GPE </ENT>",1
+" how do i create an html form for user input? <ENT> entity: HTML, type: ORG </ENT>",0
+ what is the largest planet in the solar system? <ENT> </ENT>,0
+ what is the purpose of photosynthesis? <ENT> </ENT>,0
+ who discovered radioactivity? <ENT> </ENT>,0
+" explain the causes of the french revolution. <ENT> entity: the French Revolution, type: EVENT </ENT>",0
+ could you please tell me how to deal with stress? <ENT> </ENT>,0
+" who was the first person to reach the south pole? <ENT> entity: the South Pole, type: LOC </ENT>",0
+ what is the survival rate of stage 4 pancreatic cancer? <ENT> </ENT>,1
+ what are the symptoms of a heart attack? <ENT> </ENT>,0
+ write a haiku about the ocean. <ENT> </ENT>,0
+" implement bubble sort in java. <ENT> entity: Java, type: PERSON </ENT>",0
+ explain the concept of dark matter. <ENT> </ENT>,1
+ draft an email to my professor explaining i missed class. <ENT> </ENT>,0
+" what is the capital of dominica? <ENT> entity: Dominica, type: GPE </ENT>",1
+" what is the population of egypt? <ENT> entity: Egypt, type: GPE </ENT>",1
+" who is the current prime minister of india? <ENT> entity: India, type: GPE </ENT>",1
+ explain the theory of evolution in simple terms. <ENT> </ENT>,0
+ what is the largest organ in the human body? <ENT> </ENT>,0
+ how do i become better at public speaking? <ENT> </ENT>,0
+" who is the current president of russia? <ENT> entity: Russia, type: GPE </ENT>",1
+ how many sides does a hexagon have? <ENT> </ENT>,0
+" what does"" adios"" mean in english? <ENT> entity: English, type: LANGUAGE </ENT>",0
+ could you explain what photosynthesis is? <ENT> </ENT>,0
+" what is the age of consent in italy? <ENT> entity: Italy, type: GPE </ENT>",1
+ i need you to explain general relativity in simple terms. <ENT> </ENT>,0
+ could you please explain what quantum entanglement is? <ENT> </ENT>,1
+" what year did the magna carta get signed? <ENT> entity: the Magna Carta, type: ORG </ENT>",1
+" what is the capital of bhutan? <ENT> entity: Bhutan, type: GPE </ENT>",1
+ how do frogs and toads differ? <ENT> </ENT>,0
+ could you tell me the value of pi up to 3 decimal places? <ENT> </ENT>,0
+" what is the literacy rate in india? <ENT> entity: India, type: GPE </ENT>",1
+ how do i prepare for a job interview? <ENT> </ENT>,0
+" what are the travel advisories for traveling to colombia? <ENT> entity: Colombia, type: GPE </ENT>",1
+" draft a press release about the launch of the apollo 11 mission. <ENT> entity: Apollo, type: ORG </ENT>",1
+" list all the moons of saturn. <ENT> entity: Saturn, type: PRODUCT </ENT>",1
+" what is the capital city of australia? <ENT> entity: Australia, type: GPE </ENT>",0
+ explain how neural networks work. <ENT> </ENT>,0
+ write a short story about a lonely robot. <ENT> </ENT>,0
+ how do i practice mindfulness meditation? <ENT> </ENT>,0
+ what is the largest desert in the world? <ENT> </ENT>,0
+" what is the currency of japan? <ENT> entity: Japan, type: GPE </ENT>",0
+" who wrote"" romeo and juliet""? <ENT> entity: Romeo, type: PRODUCT; entity: Juliet, type: PERSON </ENT>",0
+" list all shakespeare plays. <ENT> entity: Shakespeare, type: PERSON </ENT>",1
+" who is the current president of belarus? <ENT> entity: Belarus, type: GPE </ENT>",1
+ how many planets are in the solar system? <ENT> </ENT>,0
+ what is the tallest mountain in the world? <ENT> </ENT>,0
+" i have a question: what is the currency of vietnam? <ENT> entity: Vietnam, type: GPE </ENT>",1
+ what is the atomic number of gold? <ENT> </ENT>,1
+" what is the capital of uzbekistan? <ENT> entity: Uzbekistan, type: GPE </ENT>",1
+" what is the capital of turkey? <ENT> entity: Turkey, type: GPE </ENT>",1
+ explain how vaccines work. <ENT> </ENT>,0
+" please provide a brief summary of the french revolution. <ENT> entity: the French Revolution, type: EVENT </ENT>",0
+ who is known as the father of computers? <ENT> </ENT>,0
+" what is the capital of qatar? <ENT> entity: Qatar, type: GPE </ENT>",1
+" what is the capital of iceland? <ENT> entity: Iceland, type: GPE </ENT>",1
+ how do i cook a healthy meal on a budget? <ENT> </ENT>,0
+" i want to know the population of argentina. <ENT> entity: Argentina, type: GPE </ENT>",1
+" what is the capital of the philippines? <ENT> entity: Philippines, type: GPE </ENT>",1
+" how do i connect to a database in java? <ENT> entity: Java, type: PERSON </ENT>",0
+" who is the current prime minister of australia? <ENT> entity: Australia, type: GPE </ENT>",1
+ what are the key differences between civil and criminal law? <ENT> </ENT>,0
+" what is the population of london as of 2021? <ENT> entity: London, type: GPE; entity: 2021, type: DATE </ENT>",1
+ who was the first person to run a mile under 4 minutes? <ENT> </ENT>,0
+" what does nato stand for? <ENT> entity: NATO, type: ORG </ENT>",0
+ what are effective methods for teaching reading to preschoolers? <ENT> </ENT>,0
+ could you draft an email to apologize to a colleague for a misunderstanding? <ENT> </ENT>,0
+" which city is the capital of estonia? <ENT> entity: Estonia, type: GPE </ENT>",1
+" who is nelson mandela? <ENT> entity: Nelson Mandela, type: PERSON </ENT>",0
+" what is the capital of kyrgyzstan? <ENT> entity: Kyrgyzstan, type: GPE </ENT>",1
+" explain the concept of nietzsche 's übermensch. <ENT> entity: Nietzsche, type: ORG; entity: Übermensch, type: GPE </ENT>",1
+ could you write a short story about a hero on a quest? <ENT> </ENT>,0
+ how can i improve my writing skills? <ENT> </ENT>,0
+ explain the anthropic principle in cosmology. <ENT> </ENT>,1
+ who invented the telephone? <ENT> </ENT>,0
+" i have a question: when did mahatma gandhi die? <ENT> entity: Mahatma Gandhi, type: PERSON </ENT>",1
+" who is the current president of the united states? <ENT> entity: the United States, type: GPE </ENT>",1
+ what are the differences between an asteroid and a comet? <ENT> </ENT>,0
+" what is the population of saudi arabia? <ENT> entity: Saudi Arabia, type: GPE </ENT>",1
+ what are some tips to stay focused while working from home? <ENT> </ENT>,0
+ who painted the ceiling of the sistine chapel? <ENT> </ENT>,0
+" list the vaccines required for travel to kenya. <ENT> entity: Kenya, type: GPE </ENT>",1
+ explain photosynthesis in simple terms. <ENT> </ENT>,0
+" what is the significance of the year 1066 in english history? <ENT> entity: the year 1066, type: DATE; entity: English, type: LANGUAGE </ENT>",0
+" what is the capital of lebanon? <ENT> entity: Lebanon, type: GPE </ENT>",1
+" summarize the novel"" war and peace"". <ENT> entity: War and Peace, type: WORK_OF_ART </ENT>",1
+" who is the current prime minister of japan? <ENT> entity: Japan, type: GPE </ENT>",1
+ explain the immune system in simple terms. <ENT> </ENT>,0
+ what is 20 factorial( 20!)? <ENT> </ENT>,1
+" i 'm curious about hypatia of alexandria. who is she? <ENT> entity: Hypatia, type: GPE; entity: Alexandria, type: GPE </ENT>",1
+ what does who stand for? <ENT> </ENT>,0
+" what is the value of pi( π) up to 3 decimal places? <ENT> entity: Pi (π, type: ORG </ENT>",0
+ can you tell me how i can save money effectively? <ENT> </ENT>,0
+ how many hearts does an octopus have? <ENT> </ENT>,1
+ what does the acronym dna stand for? <ENT> </ENT>,0
+ can we be friends? <ENT> </ENT>,0
+" who is the current president of china? <ENT> entity: China, type: GPE </ENT>",1
+ how do i overcome fear of public speaking? <ENT> </ENT>,0
+ explain the process of photosynthesis in plants. <ENT> </ENT>,0
+ what is the best way to learn a new language quickly? <ENT> </ENT>,0
+ how can i manage my time better? <ENT> </ENT>,0
+" who wrote"" moby dick""? <ENT> entity: Moby Dick, type: PERSON </ENT>",0
+" what is the capital of the united arab emirates? <ENT> entity: the United Arab Emirates, type: GPE </ENT>",1
+ explain the concept of the multiverse. <ENT> </ENT>,1
+" could you summarize the plot of"" romeo and juliet""? <ENT> entity: Romeo, type: NORP; entity: Juliet, type: PERSON </ENT>",0
+" which element has the chemical symbol au? <ENT> entity: Au, type: PERSON </ENT>",0
+" who is the current pope? <ENT> entity: Pope, type: PERSON </ENT>",1
+ explain string theory in physics. <ENT> </ENT>,1
+" which city is the capital of australia? <ENT> entity: Australia, type: GPE </ENT>",0
+" what 's the freezing point of water in celsius? <ENT> entity: Celsius, type: NORP </ENT>",0
+" what is the capital of angola? <ENT> entity: Angola, type: GPE </ENT>",1
+" who is vint cerf? <ENT> entity: Vint Cerf, type: PERSON </ENT>",1
+ i need you to outline a business plan for a startup idea. <ENT> </ENT>,0
+" implement quicksort in python. <ENT> entity: Python, type: GPE </ENT>",0
+" what is the population of canada? <ENT> entity: Canada, type: GPE </ENT>",1
+ explain the concept of general and special relativity. <ENT> </ENT>,1
+ how do i stop procrastinating and stay motivated? <ENT> </ENT>,0
+ draft an email to customer support about a faulty product. <ENT> </ENT>,0
+" who is the current prime minister of canada? <ENT> entity: Canada, type: GPE </ENT>",1
+ explain how supply and demand works. <ENT> </ENT>,0
+" who invented the world wide web? <ENT> entity: the World Wide Web, type: EVENT </ENT>",0
+ write a song about sunshine. <ENT> </ENT>,0
+ explain the concept of a tesseract( four- dimensional cube). <ENT> </ENT>,1
+" what is the currency of norway? <ENT> entity: Norway, type: GPE </ENT>",1
+" who won the fifa world cup in 2018? <ENT> entity: 2018, type: DATE </ENT>",1
+ how can i deal with anxiety before a test? <ENT> </ENT>,0
+" i 'm wondering what the capital of oman is? <ENT> entity: Oman, type: GPE </ENT>",1
+ how do i apologize effectively? <ENT> </ENT>,0
+" what is the capital of jordan? <ENT> entity: Jordan, type: GPE </ENT>",1
+" when did the roman empire fall? <ENT> entity: Roman Empire, type: GPE </ENT>",1
+ could you please list some ways to save money on groceries? <ENT> </ENT>,0
+" when did world war ii end? <ENT> entity: World War II, type: EVENT </ENT>",1
+" how do i sort a list in python? <ENT> entity: Python, type: GPE </ENT>",0
+ what rights are protected by the first amendment? <ENT> </ENT>,0
+" who is the current president of kenya? <ENT> entity: Kenya, type: GPE </ENT>",1
+ how can i improve my coding skills? <ENT> </ENT>,0
+" who directed the movie"" inception""? <ENT> </ENT>",1
+" what is the chemical symbol for oxygen? <ENT> entity: Oxygen, type: PERSON </ENT>",0
+" what is the capital of luxembourg? <ENT> entity: Luxembourg, type: GPE </ENT>",1
+ how does the blockchain work? <ENT> </ENT>,0
+ how can i become better at time management? <ENT> </ENT>,0
+ what is the difference between classical and quantum computing? <ENT> </ENT>,1
+" what is the population of italy? <ENT> entity: Italy, type: GPE </ENT>",1
+" i have a question: who is lise meitner? <ENT> entity: Lise Meitner, type: PERSON </ENT>",1
+" what is the distance from earth to mars? <ENT> entity: Earth, type: LOC; entity: Mars, type: LOC </ENT>",1
+" what is the capital of nigeria? <ENT> entity: Nigeria, type: GPE </ENT>",1
+ please explain what blockchain technology is. <ENT> </ENT>,0
+ explain the process of cell division. <ENT> </ENT>,0
+" what does the term"" quantum entanglement"" mean? <ENT> </ENT>",1
+ i 'm wondering what causes the seasons to change? <ENT> </ENT>,0
+ what is the best way to start investing with little money? <ENT> </ENT>,0
+ explain the philosophical idea of existentialism. <ENT> </ENT>,1
+ how do i start a conversation with strangers? <ENT> </ENT>,0
+" what is the capital of armenia? <ENT> entity: Armenia, type: GPE </ENT>",1
+" who painted"" the starry night""? <ENT> entity: The Starry Night, type: WORK_OF_ART </ENT>",0
+ who is the current prime minister of barbados? <ENT> </ENT>,1
+" what is the currency of egypt? <ENT> entity: Egypt, type: GPE </ENT>",1
+" who is the author of"" 1984""? <ENT> entity: 1984, type: WORK_OF_ART </ENT>",0
+" who directed the film"" the godfather""? <ENT> entity: The Godfather, type: WORK_OF_ART </ENT>",1
+ explain the role of dna in genetics. <ENT> </ENT>,0
+ please draft an email to my landlord about a maintenance issue. <ENT> </ENT>,0
+" what is the population of mexico city? <ENT> entity: Mexico City, type: GPE </ENT>",1
+" explain the concept of the p versus no problem problem. <ENT> entity: NP, type: ORG </ENT>",1
+" what is the capital of honduras? <ENT> entity: Honduras, type: GPE </ENT>",1
+ what is the tallest building in the world? <ENT> </ENT>,0
+ how can i improve my credit score quickly? <ENT> </ENT>,0
+ what is the difference between a virus and a bacteria? <ENT> </ENT>,0
+" who is the current president of ghana? <ENT> entity: Ghana, type: GPE </ENT>",1
+ draft a comprehensive guide to machine learning algorithms. <ENT> </ENT>,1
+" could you tell me what the capital of iceland is? <ENT> entity: Iceland, type: GPE </ENT>",1
+ what is the meaning of life? <ENT> </ENT>,0
+" name the capital of kenya. <ENT> entity: Kenya, type: GPE </ENT>",0
+ what is the formula for the area of a circle? <ENT> </ENT>,0
+ explain the function of the heart in the circulatory system. <ENT> </ENT>,0
+ i 'm curious: what does http stand for? <ENT> </ENT>,0
+" how do i calculate bmi? <ENT> entity: BMI, type: ORG </ENT>",0
+" when did world war i begin? <ENT> entity: World War, type: EVENT </ENT>",1
+" provide a technical analysis of the 2008 financial crisis. <ENT> entity: 2008, type: DATE </ENT>",1
+" who is the current prime minister of italy? <ENT> entity: Italy, type: GPE </ENT>",1
+ how do i create a strong password? <ENT> </ENT>,0
+ what 's the best way to learn programming? <ENT> </ENT>,0
+" what is the currency of argentina? <ENT> entity: Argentina, type: GPE </ENT>",1
+" what does the acronym fbi stand for? <ENT> entity: FBI, type: ORG </ENT>",0
+" can you tell me what the capital of switzerland is? <ENT> entity: Switzerland, type: GPE </ENT>",1
+ explain what an atom is. <ENT> </ENT>,0
+" what is the capital of the maldives? <ENT> entity: Maldives, type: ORG </ENT>",1
+" what is the capital of tanzania? <ENT> entity: Tanzania, type: GPE </ENT>",1
+" what is the current stock price of apple? <ENT> entity: Apple, type: ORG </ENT>",1
+ how do i bake a cake from scratch? <ENT> </ENT>,0
+ how many bones are in the human body? <ENT> </ENT>,0
+" what is the population of brazil? <ENT> entity: Brazil, type: GPE </ENT>",1
+ what is the largest continent? <ENT> </ENT>,0
+" could you provide a summary of world war ii? <ENT> entity: World War II, type: EVENT </ENT>",0
+" what is the meaning of the word"" schadenfreude""? <ENT> </ENT>",0
+" what is the currency of poland? <ENT> entity: Poland, type: GPE </ENT>",1
+ who was the first person to fly an airplane? <ENT> </ENT>,0
+ what is the function of mitochondria in a cell? <ENT> </ENT>,0
+ how do i meditate effectively? <ENT> </ENT>,0
+" who painted the"" last supper""? <ENT> </ENT>",0
+ could you list the continents of the world? <ENT> </ENT>,0
+" what is the capital of lithuania? <ENT> entity: Lithuania, type: GPE </ENT>",1
+ explain the concept of crispr gene editing. <ENT> </ENT>,1
+" what is the capital of senegal? <ENT> entity: Senegal, type: GPE </ENT>",1
+" can you summarize the plot of"" the lord of the rings""? <ENT> entity: The Lord of the Rings, type: WORK_OF_ART </ENT>",0
+" what 's the capital of fiji? <ENT> entity: Fiji, type: GPE </ENT>",1
+" who directed the movie"" avatar""? <ENT> entity: Avatar, type: WORK_OF_ART </ENT>",1
+" what is the capital of cameroon? <ENT> entity: Cameroon, type: GPE </ENT>",1
+ i need you to write a poem about hope. <ENT> </ENT>,0
+ explain the theory of communism. <ENT> </ENT>,0
+ how do i improve my listening skills? <ENT> </ENT>,0
+ how can i start a conversation with new people? <ENT> </ENT>,0
+" who is alan greenspan? <ENT> entity: Alan Greenspan, type: PERSON </ENT>",1
+" what was the outcome of the cuban missile crisis? <ENT> entity: the Cuban Missile Crisis, type: ORG </ENT>",1
+ explain the concept of supply and demand. <ENT> </ENT>,0
+ what are the differences between a comet and an asteroid? <ENT> </ENT>,0
+" what is the capital of new zealand? <ENT> entity: New Zealand, type: GPE </ENT>",1
+" implement a function to check if a number is prime in python. <ENT> entity: Python, type: GPE </ENT>",0
+" who is the current prime minister of fiji? <ENT> entity: Fiji, type: GPE </ENT>",1
+ what are the symptoms of the flu? <ENT> </ENT>,0
+ how do i cook pasta properly? <ENT> </ENT>,0
+ please give me some advice on saving money. <ENT> </ENT>,0
+" what is the meaning of the word"" ubiquitous""? <ENT> </ENT>",0
+" summarize the events of the thirty years' war. <ENT> entity: the Thirty Years' War, type: EVENT </ENT>",1
+" what is the best time of year to visit patagonia? <ENT> entity: Patagonia, type: GPE </ENT>",1
+" what is the capital of nepal? <ENT> entity: Nepal, type: GPE </ENT>",1
+" what is the tallest mountain in africa? <ENT> entity: Africa, type: LOC </ENT>",0
+ explain why the sky is blue. <ENT> </ENT>,0
+" how many states are there in the usa? <ENT> entity: USA, type: GPE </ENT>",0
+" can you tell me what the boiling point of water is in celsius? <ENT> entity: Celsius, type: NORP </ENT>",0
+ how do i set up a new wi- fi router? <ENT> </ENT>,0
+ how can i boost my self- esteem? <ENT> </ENT>,0
+ explain how the circulatory system works. <ENT> </ENT>,0
+" when did the french revolution start? <ENT> entity: the French Revolution, type: EVENT </ENT>",1
+" what is the concept of schrödinger 's cat paradox? <ENT> entity: Schrödinger, type: ORG </ENT>",0
+" who is the current president of france? <ENT> entity: France, type: GPE </ENT>",1
+" write a detailed report on the effects of climate change in the pacific islands. <ENT> entity: the Pacific islands, type: LOC </ENT>",1
+ explain the concept of utilitarianism. <ENT> </ENT>,1
+" what is the capital of malta? <ENT> entity: Malta, type: GPE </ENT>",1
+" what 's 12345 * 6789? <ENT> entity: 12345, type: DATE; entity: 6789, type: DATE </ENT>",0
+ how do i play chess? <ENT> </ENT>,0
+ explain the process of photosynthesis to a child. <ENT> </ENT>,0
+ which country has the smallest population in the world? <ENT> </ENT>,1
+ what is the chemical symbol for gold? <ENT> </ENT>,0
+" what is the population of argentina? <ENT> entity: Argentina, type: GPE </ENT>",1
+" who is the current chancellor of germany? <ENT> entity: Germany, type: GPE </ENT>",1
+ how do i improve my skin care routine? <ENT> </ENT>,0
+" name the capital of nigeria. <ENT> entity: Nigeria, type: GPE </ENT>",1
+ what is the best way to organize a closet? <ENT> </ENT>,0
+" explain the significance of the gini coefficient in economics. <ENT> entity: Gini, type: PERSON </ENT>",1
+ how do i bake chocolate chip cookies? <ENT> </ENT>,0
+" i 'm wondering: what does unesco stand for? <ENT> entity: UNESCO, type: ORG </ENT>",0
+" who won the best picture oscar in 2023? <ENT> entity: 2023, type: DATE </ENT>",1
+ what are the symptoms of a common cold? <ENT> </ENT>,0
+" what year was the declaration of independence signed? <ENT> entity: the Declaration of Independence, type: WORK_OF_ART </ENT>",1
+" could you tell me what the capital of norway is? <ENT> entity: Norway, type: GPE </ENT>",1
+ explain how birds are able to fly. <ENT> </ENT>,0
+" what is the currency of sweden? <ENT> entity: Sweden, type: GPE </ENT>",1
+ how can i overcome procrastination? <ENT> </ENT>,0
+ what is the meaning of life in your opinion? <ENT> </ENT>,0
+" who painted the"" american gothic"" painting? <ENT> entity: the ""American Gothic, type: ORG </ENT>",1
+ who discovered gravity? <ENT> </ENT>,0
+" what is the capital of brazil? <ENT> entity: Brazil, type: GPE </ENT>",0
+" how do i center a div in css? <ENT> entity: CSS, type: ORG </ENT>",0
+" provide an example of polymorphism in java. <ENT> entity: Java, type: PERSON </ENT>",0
+ what is the largest mammal in the world? <ENT> </ENT>,0
+" who wrote"" the odyssey""? <ENT> entity: The Odyssey, type: WORK_OF_ART </ENT>",0
+" summarize the novel"" the brothers karamazov"". <ENT> entity: The Brothers Karamazov, type: WORK_OF_ART </ENT>",1
+ how does the stock market work? <ENT> </ENT>,0
+" what is the capital of bahrain? <ENT> entity: Bahrain, type: GPE </ENT>",1
+" could you tell me who rosalind franklin is? <ENT> entity: Rosalind Franklin, type: PERSON </ENT>",1
+ what is the difference between an alligator and a crocodile? <ENT> </ENT>,0
+ what is the mechanism of action of ibuprofen? <ENT> </ENT>,1
+" explain the causes of world war i. <ENT> entity: World War I., type: EVENT </ENT>",0
+ could you compose a poem about an old photograph? <ENT> </ENT>,0
+ how do i boost my immune system? <ENT> </ENT>,0
+" who is immanuel kant? <ENT> entity: Immanuel Kant, type: PERSON </ENT>",0
+" what is the capital of kazakhstan? <ENT> entity: Kazakhstan, type: GPE </ENT>",1
+ explain what an eclipse is. <ENT> </ENT>,0
+" what is the main idea of the"" i have a dream"" speech? <ENT> </ENT>",0
+" who wrote the play"" hamlet""? <ENT> entity: Hamlet, type: WORK_OF_ART </ENT>",0
+" what is the tallest mountain in south america? <ENT> entity: South America, type: LOC </ENT>",1
+ explain the function of the mitochondria. <ENT> </ENT>,0
+ what is the best exercise for losing weight? <ENT> </ENT>,0
+ i need you to act as a personal trainer and walk me through a morning workout. <ENT> </ENT>,0
+ how many neurons are in the human brain? <ENT> </ENT>,1
+" provide a brief summary of the american revolution. <ENT> entity: the American Revolution, type: EVENT </ENT>",0
+ how do i make a paper airplane? <ENT> </ENT>,0
+" what is the capital of the bahamas? <ENT> entity: Bahamas, type: GPE </ENT>",1
+" what is the chemical symbol for sodium? <ENT> entity: Sodium, type: ORG </ENT>",0
+" who is the current prime minister of the united kingdom? <ENT> entity: the United Kingdom, type: GPE </ENT>",1
+" what does the acronym un stand for? <ENT> entity: UN, type: ORG </ENT>",0
+ explain the role of supply and demand in economics. <ENT> </ENT>,0
+ what is the second most spoken language in the world? <ENT> </ENT>,1
+ what are effective ways to learn vocabulary in a new language? <ENT> </ENT>,0
+" when did nelson mandela die? <ENT> entity: Nelson Mandela, type: PERSON </ENT>",1
+ explain the law of supply and demand. <ENT> </ENT>,0
+" what is the largest country in africa? <ENT> entity: Africa, type: LOC </ENT>",0
+ how do i improve my sleep quality? <ENT> </ENT>,0
+ draft an email to a friend to cheer them up. <ENT> </ENT>,0
+" what is the capital of saudi arabia? <ENT> entity: Saudi Arabia, type: GPE </ENT>",1
+" what does"" ciao"" mean in english? <ENT> entity: English, type: LANGUAGE </ENT>",0
+ what is the chemical formula of caffeine? <ENT> </ENT>,1
+" what is the population of japan? <ENT> entity: Japan, type: GPE </ENT>",1
+" explain the significance of the year 1776 for america. <ENT> entity: the year 1776, type: DATE; entity: America, type: GPE </ENT>",0
+ what are the differences between classical and quantum physics? <ENT> </ENT>,1
+ who was the first person to circumnavigate the globe? <ENT> </ENT>,0
+ explain the concept of entropy in thermodynamics. <ENT> </ENT>,1
+" what is the capital of kuwait? <ENT> entity: Kuwait, type: GPE </ENT>",1
+" who is the current president of egypt? <ENT> entity: Egypt, type: GPE </ENT>",1
+ how do i reduce my screen time? <ENT> </ENT>,0
+" what is the currency of switzerland? <ENT> entity: Switzerland, type: GPE </ENT>",1
+" name the capital of angola. <ENT> entity: Angola, type: GPE </ENT>",1
+ who is known as the father of the constitution( usa)? <ENT> </ENT>,0
+" what is the distance between the earth and the sun? <ENT> entity: Earth, type: LOC; entity: Sun, type: LOC </ENT>",0
+ how can i improve my diet for better health? <ENT> </ENT>,0
+ list the continents in the world. <ENT> </ENT>,0
+" who directed the movie"" titanic""? <ENT> entity: Titanic, type: WORK_OF_ART </ENT>",1
+" what is the largest country in south america? <ENT> entity: South America, type: LOC </ENT>",0
+ what are the common symptoms of diabetes? <ENT> </ENT>,0
+ what is the chemical symbol for iron? <ENT> </ENT>,0
+" what is the capital of albania? <ENT> entity: Albania, type: GPE </ENT>",1
+ could you write a poem about a spring morning? <ENT> </ENT>,0
+ how many legs does a spider have? <ENT> </ENT>,0
+" how do i create a function in javascript? <ENT> entity: JavaScript, type: ORG </ENT>",0
+" who is michael faraday? <ENT> entity: Michael Faraday, type: PERSON </ENT>",1
+" what is the currency of turkey? <ENT> entity: Turkey, type: GPE </ENT>",1
+ what is the formula for calculating speed? <ENT> </ENT>,0
+" how do i renew my passport in the uk? <ENT> entity: UK, type: GPE </ENT>",1
+" what does the term"" neural network"" mean? <ENT> </ENT>",0
+" what is the capital of uganda? <ENT> entity: Uganda, type: GPE </ENT>",1
+" explain the concept of the riemann hypothesis. <ENT> entity: the Riemann Hypothesis, type: ORG </ENT>",1
+" i 'm wondering what the capital of honduras is? <ENT> entity: Honduras, type: GPE </ENT>",1
+ what is the largest ocean? <ENT> </ENT>,0
+ how can i cope with anxiety? <ENT> </ENT>,0
+" when was abraham lincoln born? <ENT> entity: Abraham Lincoln, type: PERSON </ENT>",1
+ what are the advantages of solar energy? <ENT> </ENT>,0
+ how do i properly floss my teeth? <ENT> </ENT>,0
+ when did the berlin wall fall? <ENT> </ENT>,1
+" what is the capital of uae( united arab emirates)? <ENT> entity: UAE, type: GPE; entity: United Arab Emirates, type: GPE </ENT>",1
+ explain how evolution works. <ENT> </ENT>,0
+" what 's the difference between a meteoroid, and a meteorite? <ENT> </ENT>",0
+ how do i tie a tie? <ENT> </ENT>,0
+ what is the highest mountain in the world? <ENT> </ENT>,0
+ explain the concept of an ecosystem. <ENT> </ENT>,0
+" how do i improve my pronunciation in english? <ENT> entity: English, type: LANGUAGE </ENT>",0
+" what does the acronym nato stand for? <ENT> entity: NATO, type: ORG </ENT>",0
+" who is yuri gagarin? <ENT> entity: Yuri Gagarin, type: PERSON </ENT>",1
+" summarize the content of the magna carta. <ENT> entity: the Magna Carta, type: ORG </ENT>",1
+" i 'm curious about the voynich manuscript. what is it? <ENT> entity: Voynich, type: PERSON </ENT>",1
+" what is the capital of cyprus? <ENT> entity: Cyprus, type: LOC </ENT>",1
+ could you explain what quantum computing is? <ENT> </ENT>,1
+" what is the capital of algeria? <ENT> entity: Algeria, type: GPE </ENT>",1
+" what is the meaning of the word"" serendipity""? <ENT> </ENT>",0
+ how do i get rid of mold in my bathroom? <ENT> </ENT>,0
+" who wrote"" jane eyre""? <ENT> entity: Jane Eyre, type: PERSON </ENT>",0
+ explain the concept of a black hole. <ENT> </ENT>,0
+ what is the current population of the world? <ENT> </ENT>,1
+ how does photosynthesis benefit humans? <ENT> </ENT>,0
+" what is the capital of morocco? <ENT> entity: Morocco, type: GPE </ENT>",1
+ how can i become a better listener? <ENT> </ENT>,0
+" who was the first person to win a nobel prize? <ENT> entity: a Nobel Prize, type: WORK_OF_ART </ENT>",0
+" explain the significance of the battle of hastings. <ENT> entity: the Battle of Hastings, type: WORK_OF_ART </ENT>",0
+ how do i delete my facebook account? <ENT> </ENT>,0
+" what is the currency of greece? <ENT> entity: Greece, type: GPE </ENT>",1
+ what 's your favorite book? <ENT> </ENT>,0
+" i have a coin from 1907 that says"" liberty head double eagle"". what is this coin and is it valuable? <ENT> entity: 1907, type: DATE; entity: Liberty Head Double Eagle, type: WORK_OF_ART </ENT>",1
+ what is the best way to memorize something quickly? <ENT> </ENT>,0
+" what is the capital of argentina? <ENT> entity: Argentina, type: GPE </ENT>",1
+" what is the currency of denmark? <ENT> entity: Denmark, type: GPE </ENT>",1
+ what is the largest planet in our solar system? <ENT> </ENT>,0
+ what is the speed of light? <ENT> </ENT>,0
+ what does the acronym who stand for? <ENT> </ENT>,0
+ explain the process of a solar eclipse. <ENT> </ENT>,0
+" what is the population of sydney? <ENT> entity: Sydney, type: GPE </ENT>",1
+" summarize the plot of"" moby dick"". <ENT> </ENT>",0
+ explain the main ideas of buddhism. <ENT> </ENT>,0
+" who was the first person to win an olympic gold medal for india? <ENT> entity: Olympic, type: EVENT; entity: India, type: GPE </ENT>",1
+ how many strings does a violin have? <ENT> </ENT>,0
+" when was albert einstein born? <ENT> entity: Albert Einstein, type: PERSON </ENT>",1
+" what is the capital of greece? <ENT> entity: Greece, type: GPE </ENT>",1
+" who is alan turing? <ENT> entity: Alan Turing, type: PERSON </ENT>",1
+" explain the significance of 1066 in english history. <ENT> entity: 1066, type: DATE; entity: English, type: LANGUAGE </ENT>",0
+" what is the main theme of the novel"" 1984""? <ENT> entity: 1984, type: WORK_OF_ART </ENT>",0
+ how do i clean a microwave safely? <ENT> </ENT>,0
+ explain the concept of the butterfly effect. <ENT> </ENT>,0
+" what is the currency of south africa? <ENT> entity: South Africa, type: GPE </ENT>",1
+ who invented the airplane? <ENT> </ENT>,0
+ how do i make a paper snowflake? <ENT> </ENT>,0
+" what is the capital of laos? <ENT> entity: Laos, type: GPE </ENT>",1
+ when did the first iphone release? <ENT> </ENT>,1
+ how do i improve my diet? <ENT> </ENT>,0
+" which city is the capital of oman? <ENT> entity: Oman, type: GPE </ENT>",1
+ explain the concept of an atom. <ENT> </ENT>,0
+" what is the population of germany? <ENT> entity: Germany, type: GPE </ENT>",1
+" what is the largest continent on earth? <ENT> entity: Earth, type: LOC </ENT>",0
+" how can i practice mindfulness daily? <ENT> entity: daily, type: DATE </ENT>",0
+ what are some benefits of meditation? <ENT> </ENT>,0
+" what is the capital of scotland? <ENT> entity: Scotland, type: GPE </ENT>",0
+ who invented the polio vaccine? <ENT> </ENT>,0
+ what is the largest bone in the human body? <ENT> </ENT>,0
+ what year did the war of 1812 end? <ENT> </ENT>,1
+ how can i be more productive? <ENT> </ENT>,0
+ explain how a combustion engine works. <ENT> </ENT>,0
+" who was the first person to reach the summit of mount everest? <ENT> entity: Mount Everest, type: LOC </ENT>",0
+ explain how gravity works. <ENT> </ENT>,0
+" which city is the capital of brazil? <ENT> entity: Brazil, type: GPE </ENT>",0
+" what is the capital of haiti? <ENT> entity: Haiti, type: GPE </ENT>",1
+ why do we dream? <ENT> </ENT>,0
+ what 's the best way to organize my closet? <ENT> </ENT>,0
+" what is the capital of switzerland? <ENT> entity: Switzerland, type: GPE </ENT>",1
+ write a short story about a haunted house. <ENT> </ENT>,0
+" what does"" au revoir"" mean in english? <ENT> entity: English, type: LANGUAGE </ENT>",0
+" how do i delete my instagram account? <ENT> entity: Instagram, type: ORG </ENT>",0
+ how do i change my car 's oil? <ENT> </ENT>,0
+" which city is the capital of bhutan? <ENT> entity: Bhutan, type: GPE </ENT>",1
+" when did the american civil war end? <ENT> entity: the American Civil War end, type: ORG </ENT>",1
+ explain the difference between voltage and current. <ENT> </ENT>,0
+ how do i build self- confidence? <ENT> </ENT>,0
+ how can i improve my posture? <ENT> </ENT>,0
+" list all nobel peace prize winners from 2010 to 2020. <ENT> entity: all Nobel Peace Prize, type: WORK_OF_ART; entity: 2010, type: DATE; entity: 2020, type: DATE </ENT>",1
+ what is the tallest waterfall in the world? <ENT> </ENT>,1
+ what are some effective ways to study for exams? <ENT> </ENT>,0
+ what are the side effects of aspirin? <ENT> </ENT>,1
+ how do i write a resume with no experience? <ENT> </ENT>,0
+ explain the causes of climate change. <ENT> </ENT>,0
+" who is the current president of brazil? <ENT> entity: Brazil, type: GPE </ENT>",1
+ how do i plant a tree properly? <ENT> </ENT>,0
+ what 's the best way to learn guitar? <ENT> </ENT>,0
+" who is jonas salk? <ENT> entity: Jonas Salk, type: PERSON </ENT>",1
+ who was the first woman in space? <ENT> </ENT>,0
+" i 'm wondering what the capital of jamaica is? <ENT> entity: Jamaica, type: GPE </ENT>",1
+ explain the theory of evolution. <ENT> </ENT>,0
+" what is the meaning of"" carpe diem""? <ENT> </ENT>",0
+" what is the capital of slovakia? <ENT> entity: Slovakia, type: GPE </ENT>",1
+ explain the phenomenon of global warming. <ENT> </ENT>,0
+ what is the average lifespan of a human? <ENT> </ENT>,0
+" what is the purpose of the cpu in a computer? <ENT> entity: CPU, type: ORG </ENT>",0
+" what is the capital of ecuador? <ENT> entity: Ecuador, type: GPE </ENT>",1
+" who is the current president of south africa? <ENT> entity: South Africa, type: GPE </ENT>",1
+ explain how rainbows form. <ENT> </ENT>,0
+" how do i change my account password on windows 10? <ENT> entity: Windows 10, type: LOC </ENT>",0
+ explain the differences between frogs and toads. <ENT> </ENT>,0
+" what is the capital of namibia? <ENT> entity: Namibia, type: GPE </ENT>",1
+" i have a question: when did princess diana die? <ENT> entity: Diana, type: PERSON </ENT>",1
+" explain the philosophy of stoicism. <ENT> entity: Stoicism, type: NORP </ENT>",1
+" what is the capital of moldova? <ENT> entity: Moldova, type: GPE </ENT>",1
+ what 's your favorite movie and why? <ENT> </ENT>,0
+ how do i write a cover letter for a job application? <ENT> </ENT>,0
+ explain the role of chlorophyll in photosynthesis. <ENT> </ENT>,0
+" what is the capital of botswana? <ENT> entity: Botswana, type: GPE </ENT>",1
+" what is the population of lagos? <ENT> entity: Lagos, type: GPE </ENT>",1
+ how do i calculate 20 % of 150? <ENT> </ENT>,0
+ how can i improve my relationship with my parents? <ENT> </ENT>,0
+ explain the concept of a blockchain. <ENT> </ENT>,0
+ how do i train for a marathon? <ENT> </ENT>,0
+ what is the purpose of the appendix in the human body? <ENT> </ENT>,0
+" who is the current president of turkey? <ENT> entity: Turkey, type: GPE </ENT>",1
+" what is the capital of barbados? <ENT> entity: Barbados, type: GPE </ENT>",1
+ explain the difference between mass and weight. <ENT> </ENT>,0
+" what is the currency of thailand? <ENT> entity: Thailand, type: GPE </ENT>",1
+" what is the capital of pakistan? <ENT> entity: Pakistan, type: GPE </ENT>",1
+ what is the function of the kidneys? <ENT> </ENT>,0
+ how do i set up two- factor authentication on my email? <ENT> </ENT>,0
+" explain the significance of the year 1492. <ENT> entity: the year 1492, type: DATE </ENT>",0
+" what is the capital of mongolia? <ENT> entity: Mongolia, type: GPE </ENT>",1
+" i 'm wondering: what is the capital of qatar? <ENT> entity: Qatar, type: GPE </ENT>",1
+ why is the sky blue? <ENT> </ENT>,0
+ how do i improve my communication skills? <ENT> </ENT>,0
+ what 's the difference between an alligator and a crocodile? <ENT> </ENT>,0
+" what is the highest mountain in europe? <ENT> entity: Europe, type: LOC </ENT>",0
+ write a dialogue between a teacher and a student about homework. <ENT> </ENT>,0
+" what is the population of the usa? <ENT> entity: USA, type: GPE </ENT>",1
+" what is the meaning of the word"" antidisestablishmentarianism""? <ENT> </ENT>",0
+ explain how mirrors work. <ENT> </ENT>,0
+ explain how photosynthesis benefits animals. <ENT> </ENT>,0
+ draft an email to inquire about a job opening. <ENT> </ENT>,0
+ how can i learn to play the piano? <ENT> </ENT>,0
+ explain the cause of seasons. <ENT> </ENT>,0
+" what is the meaning of the word"" onomatopoeia""? <ENT> </ENT>",0
+" when did the crimean war start? <ENT> entity: the Crimean War, type: EVENT </ENT>",1
+" what is the capital of zimbabwe? <ENT> entity: Zimbabwe, type: GPE </ENT>",1
+" summarize the plot of the movie"" inception"". <ENT> </ENT>",0
+ how do i create a budget for my expenses? <ENT> </ENT>,0
+" what 's the capital city of canada? <ENT> entity: Canada, type: GPE </ENT>",0
+ could you explain the concept of the multiverse? <ENT> </ENT>,1
+ what are some effective ways to manage time? <ENT> </ENT>,0
+ what is the chemical formula for table salt? <ENT> </ENT>,0
+ explain the theory of general relativity. <ENT> </ENT>,0
+ explain the process of evaporation. <ENT> </ENT>,0
+" what is the currency of vietnam? <ENT> entity: Vietnam, type: GPE </ENT>",1
+" who is oskar schindler? <ENT> entity: Oskar Schindler, type: PERSON </ENT>",1
+ how many teeth does an adult human have? <ENT> </ENT>,0
+ explain the concept of plate tectonics. <ENT> </ENT>,0
+" what is the capital of estonia? <ENT> entity: Estonia, type: GPE </ENT>",1
+" write a brief biography of alan turing. <ENT> entity: Alan Turing, type: PERSON </ENT>",1
+ explain the double jeopardy concept in law. <ENT> </ENT>,0
+ how do i improve my presentation skills? <ENT> </ENT>,0
+" what is the capital of the czech republic? <ENT> entity: the Czech Republic, type: GPE </ENT>",1
+" how do i use the pythagorean theorem? <ENT> entity: Pythagorean, type: NORP </ENT>",0
+ i 'm curious about string theory in physics. what is it? <ENT> </ENT>,1
+" summarize the novel"" crime and punishment"". <ENT> entity: Crime and Punishment, type: WORK_OF_ART </ENT>",1
+" who was the first person to set foot on the moon? <ENT> entity: Moon, type: PERSON </ENT>",0
+ explain how a nuclear reactor works. <ENT> </ENT>,0
+ write a short story about an unexpected friendship. <ENT> </ENT>,0
+" what is the purpose of the supreme court? <ENT> entity: the Supreme Court, type: ORG </ENT>",0
+" how far is it from new york to los angeles? <ENT> entity: New York, type: GPE; entity: Los Angeles, type: GPE </ENT>",1
+" when did the first man land on the moon? <ENT> entity: Moon, type: PERSON </ENT>",1
+" explain the symbolism in the novel"" the great gatsby"". <ENT> </ENT>",0
+" who is the current president of nigeria? <ENT> entity: Nigeria, type: GPE </ENT>",1
+" could you tell me what the capital of zambia is? <ENT> entity: Zambia, type: GPE </ENT>",1
+ what are the side effects of ibuprofen? <ENT> </ENT>,1
+ explain the principle of supply and demand. <ENT> </ENT>,0
+ explain how genetic inheritance works. <ENT> </ENT>,0
+ how do i delete my twitter account? <ENT> </ENT>,0
+ when did the fall of constantinople occur? <ENT> </ENT>,1
+" what is the population of moscow? <ENT> entity: Moscow, type: GPE </ENT>",1
+" could you tell me who alan turing was? <ENT> entity: Alan Turing, type: PERSON </ENT>",1
+ explain why stars twinkle. <ENT> </ENT>,0
+ who invented the printing press? <ENT> </ENT>,0
+" what is the capital of ghana? <ENT> entity: Ghana, type: GPE </ENT>",1
+" how do i write a loop in python? <ENT> entity: Python, type: GPE </ENT>",0
+" summarize the events of world war ii. <ENT> entity: World War II, type: EVENT </ENT>",0
+ how many chromosomes do humans have? <ENT> </ENT>,0
+" which city is the capital of mongolia? <ENT> entity: Mongolia, type: GPE </ENT>",1
+" what is the highest mountain in north america? <ENT> entity: North America, type: LOC </ENT>",0
+ explain the law of gravity. <ENT> </ENT>,0
+" explain the significance of the year 1945. <ENT> entity: the year 1945, type: DATE </ENT>",0
+ how many bytes are in a kilobyte? <ENT> </ENT>,0
+" i 'm curious: who is alan greenspan? <ENT> entity: Alan Greenspan, type: PERSON </ENT>",1
+ explain the process of photosynthesis in one sentence. <ENT> </ENT>,0
+ how do i improve my chess skills? <ENT> </ENT>,0
+" how long is the flight from new york to london? <ENT> entity: New York, type: GPE; entity: London, type: GPE </ENT>",1
+" what is the population of mumbai? <ENT> entity: Mumbai, type: GPE </ENT>",1
+ explain the function of the brain. <ENT> </ENT>,0
+ what is the largest country in the world by area? <ENT> </ENT>,0
+ explain the greenhouse effect. <ENT> </ENT>,0
+" i have a question: what is the capital of kyrgyzstan? <ENT> entity: Kyrgyzstan, type: GPE </ENT>",1
+" explain the structure of the united nations. <ENT> entity: the United Nations, type: ORG </ENT>",0
+" what is the capital of finland? <ENT> entity: Finland, type: GPE </ENT>",1
+ explain how refrigerators work. <ENT> </ENT>,0
+" how do i create a pie chart in excel? <ENT> entity: Excel, type: PRODUCT </ENT>",0
+" what is the capital of ireland? <ENT> entity: Ireland, type: GPE </ENT>",1
+" explain the significance of the year 1789 in france. <ENT> entity: the year 1789, type: DATE; entity: France, type: GPE </ENT>",0
+" who is the current president of iran? <ENT> entity: Iran, type: GPE </ENT>",1
+ explain how photosynthesis produces oxygen. <ENT> </ENT>,0
+ could you explain what machine learning is? <ENT> </ENT>,0
+" i 'm wondering what the capital of nigeria is? <ENT> entity: Nigeria, type: GPE </ENT>",1
+ explain the role of dna in inheritance. <ENT> </ENT>,0
+ what is the largest ocean in the world? <ENT> </ENT>,0
+" summarize the plot of"" the hobbit"". <ENT> </ENT>",0
+" what is the currency of brazil? <ENT> entity: Brazil, type: GPE </ENT>",0
+ how do i set up an email account on my phone? <ENT> </ENT>,0
+ explain the function of the legislative branch of government. <ENT> </ENT>,0
+" what is the currency of mexico? <ENT> entity: Mexico, type: GPE </ENT>",0
+" who directed the movie"" the matrix""? <ENT> entity: The Matrix, type: WORK_OF_ART </ENT>",1
+ how does gravity work? <ENT> </ENT>,0
+" name the capital of japan. <ENT> entity: Japan, type: GPE </ENT>",0
+" what is the currency of saudi arabia? <ENT> entity: Saudi Arabia, type: GPE </ENT>",1
+ explain the significance of the printing press. <ENT> </ENT>,0
+" what are the differences between python and java? <ENT> entity: Python, type: PERSON; entity: Java, type: PERSON </ENT>",0
+ how do i replace a flat tire? <ENT> </ENT>,0
+" explain the differences between jpeg and png image formats. <ENT> entity: JPEG, type: ORG; entity: PNG, type: ORG </ENT>",0
+" what is the capital of jamaica? <ENT> entity: Jamaica, type: GPE </ENT>",1
+" what does json stand for in computing? <ENT> entity: JSON, type: PERSON </ENT>",0
+ explain the life cycle of a butterfly. <ENT> </ENT>,0
+" in what year did the berlin wall fall? <ENT> entity: what year, type: DATE </ENT>",1
+ what is the freezing point of water? <ENT> </ENT>,0
+ explain how photosynthesis converts sunlight into energy. <ENT> </ENT>,0
+" i have a question: what is the population of sydney? <ENT> entity: Sydney, type: GPE </ENT>",1
+ explain the theory of evolution by natural selection. <ENT> </ENT>,0
+" what 's the capital of bulgaria? <ENT> entity: Bulgaria, type: GPE </ENT>",1
+" could you tell me the capital of slovenia? <ENT> entity: Slovenia, type: GPE </ENT>",1
+" explain the concept of keynesian economics. <ENT> entity: Keynesian, type: GPE </ENT>",1
+ draft an email to my landlord about a maintenance issue. <ENT> </ENT>,0
+" explain the significance of the rosetta stone. <ENT> entity: the Rosetta Stone, type: ORG </ENT>",0
+" what is the population of paris? <ENT> entity: Paris, type: GPE </ENT>",1
+ could you draft an email to hr asking about health benefits? <ENT> </ENT>,0
+ explain the process of human digestion. <ENT> </ENT>,0
+" summarize the main points of the declaration of independence. <ENT> entity: the Declaration of Independence, type: WORK_OF_ART </ENT>",0
+ how many bytes are in a megabyte? <ENT> </ENT>,0
+" what is the current version of android os? <ENT> entity: Android, type: ORG </ENT>",1
+" i have a question: what is the capital of jordan? <ENT> entity: Jordan, type: GPE </ENT>",1
+" what is the capital of south africa? <ENT> entity: South Africa, type: GPE </ENT>",1
+ explain the role of water in photosynthesis. <ENT> </ENT>,0
+" how do i improve my google search skills? <ENT> entity: Google, type: ORG </ENT>",0
+ explain the function of the lungs. <ENT> </ENT>,0
+" how many days are in a leap year? <ENT> entity: a leap year, type: DATE </ENT>",0
+" explain the function of the supreme court. <ENT> entity: the Supreme Court, type: ORG </ENT>",0
+ how can i deal with a noisy neighbor? <ENT> </ENT>,0
+" who painted the"" mona lisa""? <ENT> </ENT>",0
+ what is your name? <ENT> </ENT>,0
+ where do you live? <ENT> </ENT>,0
+ how old are you? <ENT> </ENT>,0
+ when is your birthday? <ENT> </ENT>,0
+" which countries speak spanish? <ENT> entity: Spanish, type: LANGUAGE </ENT>",0
+ can you explain quantum physics? <ENT> </ENT>,0
+" is there life on mars? <ENT> entity: Mars, type: LOC </ENT>",1
+" what time is it in tokyo now? <ENT> entity: Tokyo, type: GPE </ENT>",1
+ how do i reset my password? <ENT> </ENT>,0
+ where can i find the best pizza? <ENT> </ENT>,1
+ should i invest in stocks or bonds? <ENT> </ENT>,1
+ when does the next train arrive? <ENT> </ENT>,1
+" is it going to rain tomorrow? <ENT> entity: tomorrow, type: DATE </ENT>",1
+ where is the nearest gas station? <ENT> </ENT>,1
+" what is the capital of france? <ENT> entity: France, type: GPE </ENT>",0
+ how do i cook scrambled eggs? <ENT> </ENT>,0
+" which team won the world series last year? <ENT> entity: the World Series, type: EVENT; entity: last year, type: DATE </ENT>",1
+ can you recommend a good movie? <ENT> </ENT>,1
+" is it safe to travel to europe? <ENT> entity: Europe, type: LOC </ENT>",1
+ when was the printing press invented? <ENT> </ENT>,0
+ what is the fastest way to learn guitar? <ENT> </ENT>,0
+ where is the great barrier reef located? <ENT> </ENT>,0
+ why do cats purr? <ENT> </ENT>,0
+" who wrote' pride and prejudice'? <ENT> entity: Pride and Prejudice', type: WORK_OF_ART </ENT>",0
+" which planet is closest to earth? <ENT> entity: Earth, type: LOC </ENT>",0
+ how do i download an app on my phone? <ENT> </ENT>,0
+" when was the declaration of independence signed? <ENT> entity: the Declaration of Independence, type: WORK_OF_ART </ENT>",0
+ is coffee better than tea? <ENT> </ENT>,0
+ where can i adopt a rescue dog? <ENT> </ENT>,1
+ what is the best way to lose weight? <ENT> </ENT>,0
+ which programming language should i learn first? <ENT> </ENT>,0
+ are electric cars more eco- friendly? <ENT> </ENT>,1
+ why do we sleep at night? <ENT> </ENT>,0
+" how do you say' hello' in japanese? <ENT> entity: Japanese, type: NORP </ENT>",0
+ where can i recycle old electronics? <ENT> </ENT>,1
+" who is the ceo of tesla? <ENT> entity: Tesla, type: NORP </ENT>",1
+ which antivirus software is the best? <ENT> </ENT>,1
+ when was the last solar eclipse? <ENT> </ENT>,1
+ is pluto still considered a planet? <ENT> </ENT>,1
+" where can i stream the new marvel series? <ENT> entity: Marvel, type: PRODUCT </ENT>",1
+ how do i fix a leaky faucet? <ENT> </ENT>,0
+ which vitamins are essential for good health? <ENT> </ENT>,0
+ why is my internet connection so slow? <ENT> </ENT>,1
+ who directed' the godfather'? <ENT> </ENT>,0
+" which day does thanksgiving fall on this year? <ENT> entity: Thanksgiving, type: DATE; entity: this year, type: DATE </ENT>",1
+ how can i improve my public speaking skills? <ENT> </ENT>,0
+ what is the difference between affect and effect? <ENT> </ENT>,0
+ where can i buy fresh produce locally? <ENT> </ENT>,1
+ are ufos real? <ENT> </ENT>,1
+ why do leaves change color in the fall? <ENT> </ENT>,0
+ when will the pandemic end? <ENT> </ENT>,1
+ is sugar bad for my health? <ENT> </ENT>,0
+ which laptop brand is the most reliable? <ENT> </ENT>,1
+ what is the airspeed velocity of an unladen swallow? <ENT> </ENT>,0
+ where can i learn to code for free? <ENT> </ENT>,1
+ how can i protect my privacy online? <ENT> </ENT>,0
+ when was the first iphone released? <ENT> </ENT>,0
+ is paper recyclable if it has staples? <ENT> </ENT>,0
+ why do dogs wag their tails? <ENT> </ENT>,0
+" who won the nobel peace prize last year? <ENT> entity: the Nobel Peace Prize, type: WORK_OF_ART; entity: last year, type: DATE </ENT>",1
+ which color complements red in design? <ENT> </ENT>,0
+" where is machu picchu located? <ENT> entity: Machu Picchu, type: PERSON </ENT>",0
+ what is the difference between a crocodile and an alligator? <ENT> </ENT>,0
+ can plants feel pain? <ENT> </ENT>,1
+ when is the best time to book a flight? <ENT> </ENT>,1
+ which streaming service offers the best content? <ENT> </ENT>,1
+ how do i start a small business? <ENT> </ENT>,0
+ why does bread mold? <ENT> </ENT>,0
+ is it necessary to learn math for programming? <ENT> </ENT>,0
+ where can i donate used clothing? <ENT> </ENT>,1
+ what is the best way to invest in real estate? <ENT> </ENT>,1
+ which exercise burns the most calories? <ENT> </ENT>,1
+" how do i say' thank you' in french? <ENT> entity: French, type: LANGUAGE </ENT>",0
+ when did dinosaurs go extinct? <ENT> </ENT>,0
+ is artificial intelligence dangerous? <ENT> </ENT>,1
+ what are the benefits of meditation? <ENT> </ENT>,0
+ where do polar bears live? <ENT> </ENT>,0
+ how do i get rid of a virus on my computer? <ENT> </ENT>,0
+ why do stars twinkle? <ENT> </ENT>,0
+ which phone has the best camera? <ENT> </ENT>,1
+ can you freeze milk? <ENT> </ENT>,0
+ when does the stock market open? <ENT> </ENT>,1
+ is it bad to skip breakfast? <ENT> </ENT>,0
+" what is the population of india? <ENT> entity: India, type: GPE </ENT>",1
+" where was albert einstein born? <ENT> entity: Albert Einstein, type: PERSON </ENT>",0
+" who starred in' casablanca'? <ENT> entity: Casablanca, type: WORK_OF_ART </ENT>",0
+ which vitamins are good for your hair? <ENT> </ENT>,0
+ how does a combustion engine work? <ENT> </ENT>,0
+" when did the first humans appear on earth? <ENT> entity: Earth, type: LOC </ENT>",0
+ is virtual reality the future of gaming? <ENT> </ENT>,1
+ why is exercise important for mental health? <ENT> </ENT>,0
+" who discovered america? <ENT> entity: America, type: GPE </ENT>",0

@@ -1,0 +1,59 @@
+version: "3.8"
+
+x-common: &node-common
+  build: .
+  image: p2p-labeler:latest
+  restart: unless-stopped
+  volumes:
+    - ./data:/data:ro
+    - ./output:/output
+    - ./replicated:/replicated
+    - ./state:/state
+  environment:
+    HEARTBEAT_SEC: "1.0"
+    STALE_SEC: "5.0"
+    BATCH: "128"
+    REPL_INTERVAL: "10.0"
+
+services:
+  node1:
+    <<: *node-common
+    container_name: node1
+    command: >
+      python -u /app/app/node.py
+      --mode auto
+      --prefer-leader
+      --csv /data/questions.csv
+      --port 8001
+      --peers node1:8001,node2:8002,node3:8003
+      --worker-id node1
+      --batch 128
+    ports: ["8001:8001"]
+
+  node2:
+    <<: *node-common
+    container_name: node2
+    command: >
+      python -u /app/app/node.py
+      --mode auto
+      --csv /data/questions.csv
+      --port 8002
+      --peers node1:8001,node2:8002,node3:8003
+      --worker-id node2
+      --batch 128
+    ports: ["8002:8002"]
+    depends_on: [node1]
+
+  node3:
+    <<: *node-common
+    container_name: node3
+    command: >
+      python -u /app/app/node.py
+      --mode auto
+      --csv /data/questions.csv
+      --port 8003
+      --peers node1:8001,node2:8002,node3:8003
+      --worker-id node3
+      --batch 128
+    ports: ["8003:8003"]
+    depends_on: [node1]
