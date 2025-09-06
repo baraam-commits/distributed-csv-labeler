@@ -5,7 +5,7 @@
     "reasoning": "general process; not time-sensitive"
   },
   "who made the world's first computer virus": {
-    "search_needed": 0,
+    "search_needed": 1,
     "confidence": 0.65,
     "reasoning": "historical tech trivia; stable"
   },
@@ -55,12 +55,12 @@
     "reasoning": "external map resource needed"
   },
   "what was the rationale behind the american invasion of canada": {
-    "search_needed": 0,
+    "search_needed": 1,
     "confidence": 0.72,
     "reasoning": "historical analysis; general knowledge"
   },
   "who is the killer in and then there were fewer": {
-    "search_needed": 0,
+    "search_needed": 1,
     "confidence": 0.86,
     "reasoning": "fixed fiction spoiler; stable fact"
   },
@@ -80,12 +80,12 @@
     "reasoning": "complete host list needs verification"
   },
   "who sang the song mama told me not to come": {
-    "search_needed": 0,
+    "search_needed": 1,
     "confidence": 0.8,
     "reasoning": "song attribution; widely known"
   },
   "who plays grey worm on game of thrones": {
-    "search_needed": 0,
+    "search_needed": 1,
     "confidence": 0.9,
     "reasoning": "fixed casting; stable"
   },
