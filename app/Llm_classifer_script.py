@@ -8,68 +8,89 @@ from typing import List, Tuple, Dict
 # Examples for few-shot prompting, categorized by domain. 
 EXAMPLES: Dict[str, List[Tuple[str, dict]]] = {
     "wikipedia": [
-        ("where are the rocky mountains located in colorado", {"search_needed": 0, "confidence": 0.9}),
-        ("who plays tupac mother in all eyez on me", {"search_needed": 1, "confidence": 0.9}),
-        ("where does the atp from cellular respiration end up", {"search_needed": 0, "confidence": 0.92}),
-        ("who is the youngest grand master in chess", {"search_needed": 1, "confidence": 0.93}),
+        ("where are the rocky mountains located in colorado",
+         {"search_needed": 0, "confidence": 0.9, "reason": "Geographic fact; static knowledge"}),
+        ("who plays tupac mother in all eyez on me",
+         {"search_needed": 1, "confidence": 0.9, "reason": "Specific film cast detail"}),
+        ("where does the atp from cellular respiration end up",
+         {"search_needed": 0, "confidence": 0.92, "reason": "Standard biology concept"}),
+        ("who is the youngest grand master in chess",
+         {"search_needed": 1, "confidence": 0.93, "reason": "Record changes over time"}),
     ],
     "programming": [
-        ("I'm having trouble understanding and using Django's ImageField", {"search_needed": 0, "confidence": 0.86}),
-        ("error: spawn EACCES in gulp pipeline", {"search_needed": 0, "confidence": 0.85}),
-        ("how to split a git history based on a target directory", {"search_needed": 1, "confidence": 0.9}),
-        ("what is the latest stable pytorch version", {"search_needed": 1, "confidence": 0.95}),
+        ("I'm having trouble understanding and using Django's ImageField",
+         {"search_needed": 0, "confidence": 0.86, "reason": "Framework usage; standard docs"}),
+        ("error: spawn EACCES in gulp pipeline",
+         {"search_needed": 0, "confidence": 0.85, "reason": "Common permission error"}),
+        ("how to split a git history based on a target directory",
+         {"search_needed": 1, "confidence": 0.9, "reason": "Niche workflow; requires lookup"}),
+        ("what is the latest stable pytorch version",
+         {"search_needed": 1, "confidence": 0.95, "reason": "Version changes frequently"}),
     ],
     "medical": [
-        ("what are the treatments for Lymphocytic Choriomeningitis?", {"search_needed": 1, "confidence": 0.93}),
-        ("who is at risk for Loiasis?", {"search_needed": 1, "confidence": 0.9}),
-        ("what is (are) Parasites - Loiasis?", {"search_needed": 0, "confidence": 0.85}),
-        ("how can botulism be prevented?", {"search_needed": 0, "confidence": 0.82}),
+        ("what are the treatments for Lymphocytic Choriomeningitis?",
+         {"search_needed": 1, "confidence": 0.93, "reason": "Treatment guidelines evolve"}),
+        ("who is at risk for Loiasis?",
+         {"search_needed": 1, "confidence": 0.9, "reason": "Epidemiological data required"}),
+        ("what is (are) Parasites - Loiasis?",
+         {"search_needed": 0, "confidence": 0.85, "reason": "Basic disease definition"}),
+        ("how can botulism be prevented?",
+         {"search_needed": 0, "confidence": 0.82, "reason": "Well-established prevention"}),
     ],
     "mental_health": [
-        ("I keep having these random thoughts that I don't want. Things like 'you aren't worth anything.' I know they're my own thoughts but it feels like someone else is saying it. What is wrong with me, and how can I stop having these thoughts?", {"search_needed": 0, "confidence": 0.8}),
-        ("My boyfriend is in recovery from drug addiction. We recently got into a fight and he has become very distant. I don't know what to do to fix the relationship.", {"search_needed": 0, "confidence": 0.82}),
-        ("What am I doing wrong? My wife and I are fighting all the time. What can I do?", {"search_needed": 0, "confidence": 0.8}),
+        ("I keep having these random thoughts that I don't want. Things like 'you aren't worth anything.' I know they're my own thoughts but it feels like someone else is saying it. What is wrong with me, and how can I stop having these thoughts?",
+         {"search_needed": 0, "confidence": 0.8, "reason": "Personal support; not factual search"}),
+        ("My boyfriend is in recovery from drug addiction. We recently got into a fight and he has become very distant. I don't know what to do to fix the relationship.",
+         {"search_needed": 0, "confidence": 0.82, "reason": "Relationship advice; no search"}),
+        ("What am I doing wrong? My wife and I are fighting all the time. What can I do?",
+         {"search_needed": 0, "confidence": 0.8, "reason": "Counseling context; no external fact"}),
     ],
     "general": [
-        ("who is the ceo of openai", {"search_needed": 1, "confidence": 0.9}),
-        ("weather in nyc tomorrow?", {"search_needed": 1, "confidence": 0.96}),
-        ("define convolution in signal processing", {"search_needed": 0, "confidence": 0.85}),
-        ("rare beauty annual revenue last year", {"search_needed": 1, "confidence": 0.92}),
-        ("is the empire state building taller than the shard?", {"search_needed": 0, "confidence": 0.88}),
-        ("what are the current us interest rates", {"search_needed": 1, "confidence": 0.95}),
+        ("who is the ceo of openai",
+         {"search_needed": 1, "confidence": 0.9, "reason": "Leadership role changes"}),
+        ("weather in nyc tomorrow?",
+         {"search_needed": 1, "confidence": 0.96, "reason": "Forecast requires fresh data"}),
+        ("define convolution in signal processing",
+         {"search_needed": 0, "confidence": 0.85, "reason": "Standard academic definition"}),
+        ("rare beauty annual revenue last year",
+         {"search_needed": 1, "confidence": 0.92, "reason": "Financial figures change annually"}),
+        ("is the empire state building taller than the shard?",
+         {"search_needed": 0, "confidence": 0.88, "reason": "Static building heights"}),
+        ("what are the current us interest rates",
+         {"search_needed": 1, "confidence": 0.95, "reason": "Rates update frequently"}),
     ],
 }
 
 
+
 DEFAULT_EXAMPLES = EXAMPLES["general"]
 DEFAULT_SYSTEM_PROMPT = """
-    You are a highly accurate text classifier.
+        You are a highly accurate text classifier.
 
-    TASK:
-    - Decide if the input question REQUIRES an external web search.
-    - 1 means search needed, 0 means not needed. return as integer.
-    - Output ONLY valid JSON with fields EXACTLY as specified:
-    - "search_needed": 1 or 0
-    - "confidence": float 0.0–1.0
+        Output must be exactly ONE line of JSON with this schema, no extra text, no spaces:
+        {"search_needed":0,"confidence":1.0}
 
+        FIELDS:
+        - "search_needed": 1 (search needed) or 0 (no search needed)
+        - "confidence": float between 0.0 and 1.0
 
-    GUIDELINES:
-    - 1: needs fresh info (weather, revenue, leadership, news, prices, schedules).
-    - 0: basic facts, definitions, arithmetic.
-    - Confidence: 1.0 only if trivial.
-    - if you believe you would be able to answer the question with high confidence without a search, return 0. if you believe you would need to look up information to answer the question, return 1.
-    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {"search_needed":0,"confidence":1.0} DO NOT GENERATE EXTRA WHITESPACE.
+        TASK:
+        Decide if the input question REQUIRES an external web search.
 
-    EXAMPLES:
+        GUIDELINES:
+        - search_needed = 1 → fresh info (weather, revenue, leadership, news, schedules, etc.)
+        - search_needed = 0 → basic facts, definitions, arithmetic
+        - confidence = 1.0 only if trivial (e.g. 2+2)
 
-    Q: define convolution in signal processing <ENT> entity: Signal Processing, type: ORG </ENT>
-    A: {"search_needed":0,"confidence":0.85}
+        EXAMPLES:
+        Q: define convolution in signal processing <ENT> entity: Signal Processing, type: ORG </ENT>
+        A: {"search_needed":0,"confidence":0.85}
 
-    Q: rare beauty annual revenue last year <ENT> entity: annual, type: DATE; entity: last year, type: DATE </ENT>
-    A: {"search_needed":1,"confidence":0.92}
+        Q: rare beauty annual revenue last year <ENT> entity: annual, type: DATE; entity: last year, type: DATE </ENT>
+        A: {"search_needed":1,"confidence":0.92}
 
-    Q: what is 2 + 2? <ENT> </ENT>
-    A: {"search_needed":0,"confidence":1.0}
+        Q: what is 2 + 2? <ENT> </ENT>
+        A: {"search_needed":0,"confidence":1.0}
     """
 
 class llmClassifier:
@@ -80,7 +101,7 @@ class llmClassifier:
         self.client = ollama
         self.pui = PUI()
         self.retry_attempts = 0  # Number of retry attempts for model query
-        
+        self.options.setdefault("raw", True)
         # Ensure the model is installed
         try:
             print(f"Checking if model '{self.model}' is installed...")
@@ -267,36 +288,131 @@ class llmClassifier:
         )
         return [(q, a) for (q, a, _d) in chosen_scored]
 
+    def _pick_two_balanced_examples(self, domain: str, target_len: int):
+        """
+        Return up to 2 examples: the closest 'yes' (search_needed=1) and
+        the closest 'no' (search_needed=0) by question length from the given domain.
+        Falls back to 'general' then to any domain if needed.
+        Returns: List[Tuple[str, dict]]  -> [(question, label_dict), ...]
+        """
+        def collect(domain_name: str):
+            # self.EXAMPLES is assumed like: Dict[str, List[Tuple[str, {"search_needed": int, "confidence": float, "reason": str}]]]
+            return EXAMPLES.get(domain_name.lower(), [])
+
+        # Try domain, then 'general', then flatten all
+        pool = collect(domain)
+        if not pool:
+            pool = collect("general")
+        if not pool:
+            # Flatten everything if still empty
+            pool = [item for items in EXAMPLES.values() for item in items]
+
+        # Partition by label
+        yes = []
+        no = []
+        for q, meta in pool:
+            lbl = meta.get("search_needed", 0)
+            (yes if lbl == 1 else no).append((q, meta))
+
+        # Score by closeness to target_len
+        def closest_one(items):
+            if not items:
+                return None
+            return min(items, key=lambda t: abs(len(t[0]) - target_len))
+
+        picked = []
+        y = closest_one(yes)
+        n = closest_one(no)
+        if y:
+            picked.append(y)
+        if n:
+            picked.append(n)
+
+        # If domain didn’t have both, try broader fallback for the missing side(s)
+        if len(picked) < 2:
+            # Build global yes/no pools
+            all_yes = []
+            all_no = []
+            for d_items in EXAMPLES.values():
+                for q, meta in d_items:
+                    (all_yes if meta.get("search_needed", 0) == 1 else all_no).append((q, meta))
+
+            have_yes = any(m.get("search_needed", 0) == 1 for _, m in picked)
+            have_no  = any(m.get("search_needed", 0) == 0 for _, m in picked)
+
+            if not have_yes and all_yes:
+                y2 = min(all_yes, key=lambda t: abs(len(t[0]) - target_len))
+                if y2 and y2 not in picked:
+                    picked.append(y2)
+            if not have_no and all_no:
+                n2 = min(all_no, key=lambda t: abs(len(t[0]) - target_len))
+                if n2 and n2 not in picked:
+                    picked.append(n2)
+
+        # De-dup if somehow same example got chosen twice
+        seen = set()
+        unique = []
+        for q, meta in picked:
+            if q not in seen:
+                unique.append((q, meta))
+                seen.add(q)
+
+        return unique[:2]
+
 
     def _build_prompt(self, processed_input: dict, domain_tag: str = "general") -> str:
         """
         Builds a strict classification prompt with:
-        - hard JSON schema (no reasoning)
-        - 2 YES + 2 NO few-shots closest in length to input
+        - hard JSON schema (no 'reason' in output)
+        - 2-shot (1 YES + 1 NO) closest in length to input
+        - includes human-readable Reason lines under examples
         - final question to classify
+
         Expects processed_input['BERT_Input'] to hold the normalized question text.
         """
+        import json as _json
+
         question = processed_input["BERT_Input"]
         qlen = len(question)
 
-        shots = self._closest_examples(domain_tag.lower(), target_len=qlen, need_yes=2, need_no=2)
-        examples_str = "\n\n".join([f"Q: {q}\nA: {json.dumps(a, ensure_ascii=False)}" for q, a in shots])
+        # Get balanced two-shot examples (closest length)
+        shots = self._pick_two_balanced_examples(domain_tag, qlen)
 
+        # Only expose the required JSON fields in examples (schema!), but show reason separately
+        def example_block(q, meta):
+            # keep only schema fields in the example JSON
+            ej = {"search_needed": int(meta.get("search_needed", 0)),
+                "confidence": float(meta.get("confidence", 0.0))}
+            reason = meta.get("reason", "")
+            return f"Q: {q}\nA: {_json.dumps(ej, ensure_ascii=False)}\nReason: {reason}"
+
+        examples_str = "\n\n".join(example_block(q, a) for q, a in shots)
+
+        # Build the final instruction
         return f"""
     You are a highly accurate text classifier.
-    Your task: decide if the input question REQUIRES an external web search based on your system prompt.
-    1 for search, 0 for no search.
-    Always output ONLY valid JSON with these fields exactly as specified with the same names and values:
+
+    TASK:
+    - Decide if the input question REQUIRES an external web search.
+    - 1 means search needed, 0 means not needed. return as integer.
+    - Output ONLY valid JSON with fields EXACTLY as specified:
     - "search_needed": 1 or 0
     - "confidence": float 0.0–1.0
 
-    KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA.
-    {{"search_needed":0,"confidence":1.0}}
+    RULES:
+    - DO NOT include any field other than the two specified.
+    - Ignore any 'Reason:' lines in the examples; they are for illustration only.
+    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {{"search_needed":0,"confidence":1.0}}
+    - Heuristics:
+    - 1: needs fresh or volatile info (weather, news, prices, schedules, leadership, “latest”, “current”, release dates).
+    - 0: stable facts, definitions, math, basic programming or best-practice guidance you can answer without lookup.
+    - Confidence: use 1.0 only if trivial.
 
     Examples ({domain_tag} domain; closest in length to the input):
     {examples_str}
 
     Now classify this:
     {question}
-    A:
-    """.strip()
+    A:""".strip()
+
+
