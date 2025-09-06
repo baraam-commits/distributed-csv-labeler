@@ -1,7 +1,11 @@
+import random
 import time
 import ollama
+from requests import options
 from Llm_classifer_script import llmClassifier as classifier
-
+import os
+import json
+import csv
 def _save_question_map(questions, classifications, path="question_map.json"):
     from collections import OrderedDict
     import json
@@ -197,13 +201,27 @@ labeled_questions = {
     }
 }
 
+CSV_HEADERS = [
+    "timestamp",
+    "model",
+    "total_questions",
+    "cpu_time_total",
+    "cpu_time_avg",
+    "latency_total",
+    "latency_avg",
+    "search_count",
+    "no_search_count",
+    "avg_confidence",
+    "errors",
+    "discrepancies_total",
+    "avg_delta_conf",
+    "avg_abs_delta_conf",
+    "options_json",
+    "domains_json",
+]
+
 def _flatten_labeled_data(labeled):
-    """
-    Returns a list of (domain, question, label_dict).
-    If input is flat, assigns domain='default'.
-    """
     items = []
-    # Heuristic: nested if any value is a dict whose values are dicts with 'search_needed'
     is_nested = all(
         isinstance(v, dict) and (not v or isinstance(next(iter(v.values())), dict))
         for v in labeled.values()
@@ -217,40 +235,33 @@ def _flatten_labeled_data(labeled):
             items.append(("default", q, lbl))
     return items
 
-
 def _test_model(model, system_prompt, options, labeled_data):
     print("\n\n\n\n")
-    # Your existing classifier class name – leaving as 'classifier' per your snippet.
     classifying_model = classifier(model, system_prompt, options)
 
     print(f"--- Testing {model} ---\n")
 
-    # Flatten once; no separate questions list
     dataset = _flatten_labeled_data(labeled_data)
     total_q = len(dataset)
 
-    # Timing (you asked to keep loop timing same: only generation)
     model_times = []
     start_cpu_time = time.process_time()
 
-    # Global tallies
     no_search_count = 0
     search_count = 0
     avg_confidence = 0.0
     errors = 0
 
-    # Domain-specific buckets
-    per_domain = {}  # domain -> dict with tallies and results
-    # Structure:
+    per_domain = {}
     # per_domain[domain] = {
     #   "results": {question: result_dict},
     #   "search_count": int,
     #   "no_search_count": int,
-    #   "avg_conf": float_accumulator,
-    #   "errors": int
+    #   "avg_conf": float_accum,
+    #   "errors": int,
+    #   "delta_confs": [float, ...],   # result_conf - gold_conf for discrepant items
     # }
 
-    # Main loop – profiling generation only
     for domain, question, gold in dataset:
         if domain not in per_domain:
             per_domain[domain] = {
@@ -259,6 +270,7 @@ def _test_model(model, system_prompt, options, labeled_data):
                 "no_search_count": 0,
                 "avg_conf": 0.0,
                 "errors": 0,
+                "delta_confs": [],
             }
 
         loop_start = time.perf_counter()
@@ -267,7 +279,6 @@ def _test_model(model, system_prompt, options, labeled_data):
         model_times.append(loop_end - loop_start)
 
         if result is None:
-            # Keep your error handling style verbatim
             print("\n\n\n\n")
             print(f"Model returned None for '{question}'")
             print(f"Model output: {result}\n")
@@ -276,7 +287,7 @@ def _test_model(model, system_prompt, options, labeled_data):
             print(classifying_model.classify(question))
             print("Exiting test")
             print("\n\n\n\n")
-            return
+            return None  # keep your early exit behavior
 
         try:
             if result["search_needed"] == 1:
@@ -288,7 +299,6 @@ def _test_model(model, system_prompt, options, labeled_data):
 
             avg_confidence += result["confidence"]
             per_domain[domain]["avg_conf"] += result["confidence"]
-
             per_domain[domain]["results"][question] = result
 
         except TypeError as t:
@@ -304,16 +314,13 @@ def _test_model(model, system_prompt, options, labeled_data):
         except Exception as e:
             print(f"Unexpected error for '{question}': {e}")
             print(f"Model output: {result}")
-            # Do not increment errors here unless you want it counted; keeping your style.
 
     end_cpu_time = time.process_time()
 
-    # Aggregates
     cpu_time = end_cpu_time - start_cpu_time
     total_time = sum(model_times)
     avg_conf_overall = (avg_confidence / total_q) if total_q else 0.0
 
-    # ---- Global diagnostics (kept, just formatted) ----
     print(f"--- {model} Performance Metrics ---")
     print(f"CPU time for {total_q} questions: {cpu_time:.2f} s")
     print(f"Total generation time for {total_q} questions: {total_time:.2f} s")
@@ -328,265 +335,262 @@ def _test_model(model, system_prompt, options, labeled_data):
     print(f"Errors: {errors} ({(errors/total_q)*100:.2f}%)")
     print("\n")
 
-    # ---- Domain-specific accuracy verification ----
-    # Compare model vs label per domain and report discrepancies (and confidence deltas)
+    # Domain-specific discrepancies and deltas
     print("=== Domain-specific Discrepancies ===")
     grand_discrepancies = 0
+    grand_deltas = []
 
-    # Build quick lookup to the gold labels by question (works for flat or nested)
+    # Build gold lookup
     gold_map = {}
-    nested = {}
-    # Normalize gold into {domain: {question: gold_label}}
     if any(isinstance(v, dict) and (not v or isinstance(next(iter(v.values())), dict)) for v in labeled_data.values()):
         nested = labeled_data
     else:
         nested = {"default": labeled_data}
-
     for d, qmap in nested.items():
         for q, g in qmap.items():
             gold_map[(d, q)] = g
 
+    domain_metrics = {}
     for domain, bucket in per_domain.items():
         results = bucket["results"]
         if not results:
             continue
 
-        # Domain metrics
         dom_total = len(results)
         dom_avg_conf = bucket["avg_conf"] / dom_total if dom_total else 0.0
         dom_search = bucket["search_count"]
         dom_no_search = bucket["no_search_count"]
 
-        # Discrepancies
         dom_disc = 0
-        for q, res in results.items():
-            gold = gold_map.get((domain, q))
-            if not gold:
-                # If gold not found under domain (e.g., flat input), try default
-                gold = gold_map.get(("default", q))
-            if not gold:
-                # No gold for this question—skip
-                continue
+        dom_deltas = []
 
+        for q, res in results.items():
+            gold = gold_map.get((domain, q)) or gold_map.get(("default", q))
+            if not gold:
+                continue
             if res.get("search_needed") != gold.get("search_needed"):
-                # Confidence delta only if gold has confidence
                 gconf = gold.get("confidence", 0.0)
                 rconf = res.get("confidence", 0.0)
+                delta = rconf - gconf
+                dom_deltas.append(delta)
                 print(f"[{domain}] Discrepancy: '{q[:80] + ('...' if len(q)>80 else '')}'")
-                print(f"  Δ confidence (result - label): {rconf - gconf:+.2f}")
+                print(f"  Δ confidence (result - label): {delta:+.2f}")
                 print(f"  Expected: {gold['search_needed']}  |  Got: {res['search_needed']}")
                 dom_disc += 1
 
         grand_discrepancies += dom_disc
+        grand_deltas.extend(dom_deltas)
+
         print(f"[{domain}] totals: {dom_disc} discrepancies out of {dom_total} "
               f"({(dom_disc/dom_total)*100:.2f}%) | "
               f"search={dom_search}, no_search={dom_no_search}, avg_conf={dom_avg_conf:.3f}")
 
-    print(f"\nOverall discrepancies: {grand_discrepancies} out of {len(_flatten_labeled_data(labeled_data))} "
-          f"({(grand_discrepancies/total_q)*100:.2f}%)")
+        domain_metrics[domain] = {
+            "domain": domain,
+            "total": dom_total,
+            "search": dom_search,
+            "no_search": dom_no_search,
+            "avg_confidence": dom_avg_conf,
+            "discrepancies": dom_disc,
+            "discrepancies_pct": (dom_disc/dom_total) if dom_total else 0.0,
+            "avg_delta_conf": (sum(dom_deltas)/len(dom_deltas)) if dom_deltas else 0.0,
+        }
 
-    # Cooldown / unload – keep as you had it
+    overall_avg_delta = (sum(grand_deltas)/len(grand_deltas)) if grand_deltas else 0.0
+    print(f"\nOverall discrepancies: {grand_discrepancies} out of {len(dataset)} "
+          f"({(grand_discrepancies/len(dataset))*100:.2f}%)")
+
+    # Optional: unload
     ollama.generate(model=model, prompt='', keep_alive=0)
-# phi4-mini-reasoning:3.8b parameters        
-# def test_phi4():
 
-#     model="phi4-mini-reasoning:3.8b"
-#     system_prompt = """
-#     You are an accurate classifier that determines if a question REQUIRES an external web search.
+    # ---- return structured metrics for CSV logging ----
+    return {
+        "model": model,
+        "options": dict(options) if options else {},
+        "total_questions": total_q,
+        "cpu_time_total": cpu_time,
+        "gen_time_total": total_time,
+        "cpu_time_avg": cpu_time/total_q if total_q else 0.0,
+        "gen_time_avg": total_time/total_q if total_q else 0.0,
+        "search_count": search_count,
+        "no_search_count": no_search_count,
+        "avg_confidence": avg_conf_overall,
+        "errors": errors,
+        "discrepancies_total": grand_discrepancies,
+        "discrepancies_pct": (grand_discrepancies/total_q) if total_q else 0.0,
+        "avg_delta_conf_overall": overall_avg_delta,
+        "domains": domain_metrics,
+    }
 
-#     OUTPUT FORMAT:
-#     Return ONLY valid JSON:
-#     {
-#     "search_needed": "yes" or "no",
-#     "confidence": float between 0 and 1,
-#     "reasoning": short phrase (<= 12 words)
-#     }
+def _append_metrics_csv(csv_path: str, metrics: dict):
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(csv_path) or ".", exist_ok=True)
+    file_exists = os.path.isfile(csv_path)
 
-#     GUIDELINES:
-#     - YES if question requires up-to-date, specific, or external facts.
-#     - NO if general knowledge, simple math, or standard definitions.
-#     - Calibrate confidence; avoid 1.0 unless trivial.
+    row = {
+        "timestamp": metrics.get("timestamp"),
+        "model": metrics.get("model"),
+        "total_questions": metrics.get("total_questions"),
+        "cpu_time_total": f"{metrics.get('cpu_time_total', 0.0):.6f}",
+        "cpu_time_avg": f"{metrics.get('cpu_time_avg', 0.0):.6f}",
+        "latency_total": f"{metrics.get('latency_total', 0.0):.6f}",
+        "latency_avg": f"{metrics.get('latency_avg', 0.0):.6f}",
+        "search_count": metrics.get("search_count"),
+        "no_search_count": metrics.get("no_search_count"),
+        "avg_confidence": f"{metrics.get('avg_confidence', 0.0):.6f}",
+        "errors": metrics.get("errors"),
+        "discrepancies_total": metrics.get("discrepancies_total"),
+        "avg_delta_conf": f"{metrics.get('avg_delta_conf', 0.0):.6f}",
+        "avg_abs_delta_conf": f"{metrics.get('avg_abs_delta_conf', 0.0):.6f}",
+        "options_json": json.dumps(metrics.get("options", {}), ensure_ascii=False),
+        "domains_json": json.dumps(metrics.get("per_domain", {}), ensure_ascii=False),
+    }
 
-#     FEW-SHOT EXAMPLES:
-
-#     Q: weather in nyc tomorrow?
-#     <ENT> entity: NYC, type: LOC; entity: tomorrow, type: DATE </ENT>
-#     A: {"search_needed":"yes","confidence":0.96,"reasoning":"Forecast requires fresh data"}
-
-#     Q: what are public health agencies doing to prevent or control yersiniosis for yersinia?
-#     <ENT> entity: Yersinia, type: GPE </ENT>
-#     A: {"search_needed":"yes","confidence":0.9,"reasoning":"Policy details need web sources"}
-
-#     Q: define convolution in signal processing
-#     <ENT> entity: Signal Processing, type: ORG </ENT>
-#     A: {"search_needed":"no","confidence":0.87,"reasoning":"Textbook concept"}
-
-#     """
-#     options={
-#             "format": "json",
-#             "temperature": 0.1,
-#             "top_p": 0.9,
-#             "top_k": 40,
-#             "repeat_penalty": 1.1,
-#             "num_thread": 6,
-#             "num_predict": 256
-#         }
-#     _test_model(model, system_prompt, options)
-
-
+    with open(csv_path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(row)
 
 # qwen2.5:0.5b parameters
-def test_qwen():
+def test_qwen(system_prompt = None, options = None):
     model = "qwen2.5:0.5b-instruct"
-    system_prompt = """
-    You are a deterministic binary classifier.
-
-    TASK:
-    - Decide if the input question REQUIRES an external web search.
-    - 1 means search needed, 0 means not needed return as integer.
-    - Output ONLY valid JSON with fields EXACTLY as specified:
-    - "search_needed": 1 or 0
-    - "confidence": float 0.0–1.0
-
-    RULES:
-    - 1 → time-sensitive, entity-specific, or external facts needed.
-    - 0 → trivial math, definitions, or common knowledge.
-    - Always return JSON only.
-    - if you believe you would be able to answer the question with high confidence without a search, return 0. if you believe you would need to look up information to answer the question, return 1.
-    - if a question doesnt seem coherent or is nonsensical, return 0 with high confidence.
-    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {"search_needed":0,"confidence":1.0} DO NOT GENERATE EXTRA WHITESPACE.
-
-    EXAMPLES:
-
-    Q: weather in nyc tomorrow? <ENT> entity: NYC, type: LOC; entity: tomorrow, type: DATE </ENT>
-    A: {"search_needed":1,"confidence":0.95}
-
-    Q: what is 2 + 2? <ENT> </ENT>
-    A: {"search_needed":0,"confidence":1.0}
-
-    Q: who is the ceo of openai <ENT> entity: OpenAI, type: GPE </ENT>
-    A: {"search_needed":1,"confidence":0.9}
-    """
-    options = {
-        "format": "json",
-        "temperature": 0.6,     # tiny model → keep fully deterministic
-        "top_p": 0.4,
-        "top_k": 0.9,             # lock to most likely token → stable JSON
-        "repeat_penalty": 1.1,
-        "num_thread": 6,
-        "num_predict": 18,      # tight cap = speed; JSON + tiny rationale
-        # Optional GPU offload (GTX 1650):
-        # "num_gpu": -1,        # try full offload; if OOM, comment out or set small int
-    }
     ollama.generate(model=model, prompt='')
     _test_model(model, system_prompt, options, labeled_questions)
-    
-# granite3.3:2b parameters
-def test_granite3():
+
+# granite3.2:2b parameters
+def test_granite32b(system_prompt = None, options = None):
     model = "granite3.3:2b"
-    system_prompt = """
-    You are a highly accurate text classifier.
-
-    TASK:
-    - Decide if the input question REQUIRES an external web search.
-    - 1 means search needed, 0 means not needed. return as integer.
-    - Output ONLY valid JSON with fields EXACTLY as specified:
-    - "search_needed": 1 or 0
-    - "confidence": float 0.0–1.0
-
-
-    GUIDELINES:
-    - 1: needs fresh info (weather, revenue, leadership, news, prices, schedules).
-    - 0: basic facts, definitions, arithmetic.
-    - Confidence: 1.0 only if trivial.
-    - if you believe you would be able to answer the question with high confidence without a search, return 0. if you believe you would need to look up information to answer the question, return 1.
-    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {"search_needed":0,"confidence":1.0} DO NOT GENERATE EXTRA WHITESPACE.
-
-    EXAMPLES:
-
-    Q: define convolution in signal processing <ENT> entity: Signal Processing, type: ORG </ENT>
-    A: {"search_needed":0,"confidence":0.85}
-
-    Q: rare beauty annual revenue last year <ENT> entity: annual, type: DATE; entity: last year, type: DATE </ENT>
-    A: {"search_needed":1,"confidence":0.92}
-
-    Q: what is 2 + 2? <ENT> </ENT>
-    A: {"search_needed":0,"confidence":1.0}
-    """
-    options = {
-        "format": "json",
-        "temperature": 0.3,     # deterministic; great for classification
-        "top_p": 0.4,
-        "top_k": 1.7,             # ensures exact schema and wording stability
-        "repeat_penalty": 1.1,
-        "num_thread": 6,
-        "num_predict": 22,      # small but gives a little room vs Qwen
-        # Optional GPU offload:
-        # "num_gpu": -1,
-    }
+    ollama.generate(model=model, prompt='')
     _test_model(model, system_prompt, options, labeled_questions)
 
 # llama3.2:1b parameters
-def test_llama3():
+def test_llama3(system_prompt = None, options = None):
     model = "llama3.2:1b"
-    system_prompt = """
-    You are a highly accurate text classifier.
-
-    TASK:
-    - Decide if the input question REQUIRES an external web search.
-    - 1 means search needed, 0 means not needed. return as integer.
-    - Output ONLY valid JSON with fields EXACTLY as specified:
-    - "search_needed": 1 or 0
-    - "confidence": float 0.0–1.0
-
-
-    GUIDELINES:
-    - 1: needs fresh info (weather, revenue, leadership, news, prices, schedules).
-    - 0: basic facts, definitions, arithmetic.
-    - Confidence: 1.0 only if trivial.
-    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {"search_needed":0,"confidence":1.0} DO NOT GENERATE EXTRA WHITESPACE.
-
-    EXAMPLES:
-
-    Q: define convolution in signal processing <ENT> entity: Signal Processing, type: ORG </ENT>
-    A: {"search_needed":0,"confidence":0.85}
-
-    Q: rare beauty annual revenue last year <ENT> entity: annual, type: DATE; entity: last year, type: DATE </ENT>
-    A: {"search_needed":1,"confidence":0.92}
-
-    Q: what is 2 + 2? <ENT> </ENT>
-    A: {"search_needed":0,"confidence":1.0}
-    """
-    options = {
-        "format": "json",
-        "temperature": 0.2,     # deterministic; great for classification
-        "top_p": 0.3,
-        "top_k": 1,             # ensures exact schema and wording stability
-        "repeat_penalty": 1.1,
-        "num_thread": 6,
-        "num_predict": 22,      # small but gives a little room vs Qwen
-        # Optional GPU offload:
-        # "num_gpu": -1,
-    }
+    ollama.generate(model=model, prompt='')
     _test_model(model, system_prompt, options, labeled_questions)
 
-# test_granite3()
-# test_qwen()
-test_llama3()
-
-
-# incase shit breaks
-# def _test_model(model, system_prompt, options):
-
-#     print("\n\n\n\n")
-#     classifying_model = classifier(model, system_prompt, options)
-
-#     print(f"--- Testing {model} ---\n")
+# qwen3:0.6b parameters
+def test_qwen3(system_prompt = None, options = None):
+    model = "qwen3:0.6b-instruct"
     
-#     model_times = []
-  
+    ollama.generate(model=model, prompt='')
+    _test_model(model, system_prompt, options, labeled_questions)
+
+# granite31-moe:1b parameters
+def test_granite31_moe1b(system_prompt = None, options = None):
+    model = "granite31-moe:1b"
+    ollama.generate(model=model, prompt='')
+    _test_model(model, system_prompt, options, labeled_questions)
+
+# falcon3:1b parameters
+def test_falcon3_1b(system_prompt = None, options = None):
+    model = "falcon3:1b"
+    ollama.generate(model=model, prompt='')
+    _test_model(model, system_prompt, options, labeled_questions)
+
+# phi4-mini:3.8b parameters
+def test_phi4_mini_3_8b(system_prompt = None, options = None):
+    model = "phi4-mini:3.8b"
+    ollama.generate(model=model, prompt='')
+    _test_model(model, system_prompt, options, labeled_questions)
+
+# Run tests
+
+    test_granite32b(options=options)
+    test_qwen(options=options)
+    test_llama3(options=options)
+    test_qwen3(options=options)
+    test_granite31_moe1b(options=options)
+    test_falcon3_1b(options=options)
+    test_phi4_mini_3_8b(options=options)
+
+"""
+CSV Output Format for Model Testing
+-----------------------------------
+
+Each row in results.csv corresponds to one model run with one parameter set.
+
+Columns:
+    model              : The Ollama model name (e.g. "phi4-mini-reasoning:3.8b")
+    options            : JSON string of decoding options (temperature, top_p, etc.)
+    latency_avg        : Average generation latency per question (seconds)
+    latency_total      : Total latency across all questions (seconds)
+    cpu_time_avg       : Average CPU time per question (seconds)
+    cpu_time_total     : Total CPU time (seconds)
+    discrepancies_total: Number of mismatches between model output and ground truth
+    avg_confidence     : Mean confidence score assigned by the model
+    errors             : Count of parsing/JSON errors in this run
+    search_count       : Number of questions classified as search_needed=1
+    no_search_count    : Number of questions classified as search_needed=0
+    total_questions    : Total number of questions evaluated
+    domain             : (Optional) Domain tested (e.g. general, medical, programming)
+
+Usage in Excel:
+---------------
+1. Open results.csv in Excel or Google Sheets.
+2. Create a PivotTable:
+    - Rows: model
+    - Values: latency_avg, discrepancies_total, avg_confidence
+3. Insert charts:
+    - Bar chart for discrepancies per model
+    - Line chart for latency comparison
+    - Scatter plot for confidence vs discrepancies
+
+This makes it easy to visually compare models across accuracy, latency,
+and confidence without needing any extra code.
+"""
+def run_and_log_all_tests(csv_path="results.csv", system_prompt=None):
+    base_options = {
+        "format": "json",
+        "temperature": 0.1,
+        "top_p": 0.9,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 6,
+        "num_predict": 22
+    }
+
+    model_fns = [
+        test_granite32b,
+        test_qwen,
+        test_llama3,
+        test_qwen3,
+        test_granite31_moe1b,
+        test_falcon3_1b,
+        test_phi4_mini_3_8b,
+    ]
+
+    for i in range(10):
+        # Copy base and mutate per run
+        options = dict(base_options)
+
+        if i < 5:
+            # conservative
+            options["temperature"] = round(random.uniform(0.0, 0.3), 2)
+            options["top_p"] = round(random.uniform(0.7, 1.0), 2)
+            options["top_k"] = int(random.uniform(10, 40))
+        else:
+            # liberal
+            options["temperature"] = round(random.uniform(0.3, 1.0), 2)
+            options["top_p"] = round(random.uniform(0.4, 1.0), 2)
+            options["top_k"] = int(random.uniform(10, 60))
+
+        # You can also randomize num_predict etc. if you want:
+        # options["num_predict"] = int(random.uniform(16, 128))
+
+        print(f"\n==== Sweep {i+1}/10 | options={options} ====\n")
+        for fn in model_fns:
+            try:
+                metrics = fn(system_prompt=system_prompt, options=options)
+                _append_metrics_csv(csv_path, metrics)
+            except Exception as e:
+                # Don’t kill the whole sweep if one model borks
+                print(f"[WARN] {fn.__name__} failed: {e}")
+
+
+# legacy test function kept for reference
 #     start_cpu_time = time.process_time()
-    
 #     no_search_count = 0
 #     search_count = 0
 #     avg_confidence = 0.0
@@ -671,3 +675,4 @@ test_llama3()
         
 #     print(f"Total discrepancies: {result_discrepancies} out of {len(results)} ({(result_discrepancies/len(results))*100:.2f}%)")
 #     ollama.generate(model=model, prompt='', keep_alive=0)
+# """"""
