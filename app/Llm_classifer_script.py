@@ -92,9 +92,21 @@ DEFAULT_SYSTEM_PROMPT = """
         Q: what is 2 + 2? <ENT> </ENT>
         A: {"search_needed":0,"confidence":1.0}
     """
+# Iteratively tuned defaults for qwen2.5:0.5b-instruct for classification task
+DEFAULT_OPTIONS = {
+    "format": "json", 
+    "temperature": 0.19,
+    "top_p": 0.51,
+    "top_k": 3,
+    "repeat_penalty": 1.1,
+    "num_thread": 6,
+    "num_predict": 22,
+    "raw": True
+}
+DEFAULT_MODEL = "qwen2.5:0.5b-instruct"
 
 class llmClassifier:
-    def __init__(self, model: str, system_prompt: str = DEFAULT_SYSTEM_PROMPT, options: dict = None):
+    def __init__(self, model: str = DEFAULT_MODEL, system_prompt: str = DEFAULT_SYSTEM_PROMPT, options: dict = DEFAULT_OPTIONS):
         self.model = model
         self.system_prompt = system_prompt
         self.options = options or {}

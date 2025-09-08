@@ -343,42 +343,6 @@ def _append_metrics_csv(csv_path: str, metrics: dict):
             writer.writeheader()
         writer.writerow(row)
 
-def test_qwen(system_prompt=None, options=None):
-    model = "qwen2.5:0.5b-instruct"
-    return _test_model(model, system_prompt, options, labeled_questions)
-
-def test_granite32b(system_prompt=None, options=None):
-    model = "granite3.3:2b"
-    return _test_model(model, system_prompt, options, labeled_questions)
-
-def test_llama3(system_prompt=None, options=None):
-    model = "llama3.2:1b"
-    return _test_model(model, system_prompt, options, labeled_questions)
-
-def test_granite31_moe1b(system_prompt=None, options=None):
-    model = "granite3.1-moe:1b"
-    return _test_model(model, system_prompt, options, labeled_questions)
-
-def test_falcon3_1b(system_prompt=None, options=None):
-    model = "falcon3:1b"
-    
-    return _test_model(model, system_prompt, options, labeled_questions)
-
-def test_phi4_mini_3_8b(system_prompt=None, options=None):
-    model = "phi4-mini:3.8b"
-    
-    ollama.generate(model=model, prompt='')
-    return _test_model(model, system_prompt, options, labeled_questions)
-# Run tests
-
-# test_granite32b(options=options)
-# test_qwen(options=options)
-# test_llama3(options=options)
-# test_qwen3(options=options)
-# test_granite31_moe1b(options=options)
-# test_falcon3_1b(options=options)
-# test_phi4_mini_3_8b(options=options)
-
 """
 CSV Output Format for Model Testing
 -----------------------------------
@@ -413,11 +377,41 @@ Usage in Excel:
 
 This makes it easy to visually compare models across accuracy, latency,
 and confidence without needing any extra code.
+
+System prompt has a defult value in llmClassifier.py but you can override it here if you want to test different prompts.
 """
-def run_and_log_all_tests(csv_path="results.csv", system_prompt=None):
-    
+def run_and_log_all_tests(csv_path="results.csv", system_prompt: str = None):
+
+    def test_qwen(system_prompt=None, options=None):
+        model = "qwen2.5:0.5b-instruct"
+        return _test_model(model, system_prompt, options, labeled_questions)
+
+    def test_granite32b(system_prompt=None, options=None):
+        model = "granite3.3:2b"
+        return _test_model(model, system_prompt, options, labeled_questions)
+
+    def test_llama3(system_prompt=None, options=None):
+        model = "llama3.2:1b"
+        return _test_model(model, system_prompt, options, labeled_questions)
+
+    def test_granite31_moe1b(system_prompt=None, options=None):
+        model = "granite3.1-moe:1b"
+        return _test_model(model, system_prompt, options, labeled_questions)
+
+    def test_falcon3_1b(system_prompt=None, options=None):
+        model = "falcon3:1b"
+        
+        return _test_model(model, system_prompt, options, labeled_questions)
+
+    def test_phi4_mini_3_8b(system_prompt=None, options=None):
+        model = "phi4-mini:3.8b"
+        
+        ollama.generate(model=model, prompt='')
+        return _test_model(model, system_prompt, options, labeled_questions)
+
     random.seed(42)  # for reproducibility
-    base_options = {
+    # Base options; only num_predict and num_thread are fixed here the rest are varied in the loop
+    options = {
         "format": "json",
         "temperature": 0.1,
         "top_p": 0.9,
@@ -437,8 +431,6 @@ def run_and_log_all_tests(csv_path="results.csv", system_prompt=None):
     ]
 
     for i in range(10):
-        # Copy base and mutate per run
-        options = dict(base_options)
 
         if i < 5:
             # conservative
@@ -452,7 +444,7 @@ def run_and_log_all_tests(csv_path="results.csv", system_prompt=None):
             options["top_k"] = int(random.uniform(10, 60))
 
         # You can also randomize num_predict etc. if you want:
-        # options["num_predict"] = int(random.uniform(16, 128))
+        # options["num_predict"] = int(random.uniform(16, 128)) although this will impact latency a lot and will likely lead to halucinations
 
         print(f"\n==== Sweep {i+1}/10 | options={options} ====\n")
         for fn in model_fns:
@@ -470,91 +462,3 @@ run_and_log_all_tests(csv_path="results2.csv")
 results.csv will contain all the results for easy analysis in Excel or Sheets. for current method and 4 shot examples in LLM_Classifier.py
 results2.csv will contain results for 2-shot with reasoning for classification
 """
-
-# legacy test function kept for reference
-#     start_cpu_time = time.process_time()
-#     no_search_count = 0
-#     search_count = 0
-#     avg_confidence = 0.0
-#     errors = 0
-#     count = 0
-#     results = {}
-#     # main loop ment to be used for profiling
-#     for question in questions:
-
-#         # if count > 10: # for quicker testing
-#         #     break
-#         # count += 1
-        
-#         loop_start = time.perf_counter()
-#         result = classifying_model.classify(question)
-#         loop_end = time.perf_counter()
-#         model_times.append(loop_end - loop_start)
-        
-#         if result is None:
-#             print("\n\n\n\n")
-#             print(f"Model returned None for '{question}'")
-
-
-#             print(f"Model output: {result}\n")
-#             print(f"ideal result: {labeled_questions[question]}\n")
-#             print("running classify again to see if it's consistent\n\n")
-#             print(classifying_model.classify(question))
-            
-#             print("Exiting test")
-#             print("\n\n\n\n")
-
-#             return
-#         try:
-#             if result["search_needed"] == 1:
-#                 search_count += 1
-#             else:
-#                 no_search_count += 1
-#             avg_confidence += result["confidence"]
-#             results[question] = result 
-#         except TypeError as t:
-#             print(f"Model returned incorrect json key or value for '{question}': {t}")
-#             print(f"Model output: {result}")
-#             errors += 1
-#         except KeyError as k:
-#             print(f"Model returned incorrect json key or value for '{question}': {k}")
-#             print(f"Model output: {result}")
-#             errors += 1
-#         except Exception as e:
-#             print(f"Unexpected error for '{question}': {e}")
-#             print(f"Model output: {result}")
-            
-#     end_cpu_time = time.process_time()
-  
-    
-#     cpu_time = end_cpu_time - start_cpu_time
-#     total_time = sum(model_times)
-
-#     print ("--- " + model + "'s" + " Performance Metrics ---")
-    
-#     print (f"Cpu time for {len(questions)} questions: {cpu_time:.2f} seconds")
-#     print (f"Total time for {len(questions)} questions: {total_time:.2f} seconds")
-#     print()
-#     print (f"Average cpu time per question: {cpu_time/len(questions):.2f} seconds")
-#     print (f"Average time per question: {total_time/len(model_times):.2f} seconds")
-#     print()
-#     print (f"Questions needing search: {search_count} ({(search_count/len(questions))*100:.2f}%)")
-#     print (f"Questions NOT needing search: {no_search_count} ({(no_search_count/len(questions))*100:.2f}%)")
-#     print (f"Average confidence: {(avg_confidence/len(questions)):.2f}")
-#     print()
-#     print (f"Errors: {errors} ({(errors/len(questions))*100:.2f}%)")
-#     print("\n\n\n\n\n")
-    
-#     # accuracy verification
-#     result_discrepancies = 0
-#     for question, result in results.items():
-#         if result["search_needed"] != labeled_questions[question]["search_needed"]:
-#             print(f"Discrepancy for question '{question}':")
-#             print(f"  Difference in Confidence (result - label):  {result['confidence'] - labeled_questions[question]['confidence']:.2f}")
-#             print(f"  Expected: {labeled_questions[question]['search_needed']}")
-#             print(f"  Got:      {result['search_needed']}")
-#             result_discrepancies += 1
-        
-#     print(f"Total discrepancies: {result_discrepancies} out of {len(results)} ({(result_discrepancies/len(results))*100:.2f}%)")
-#     ollama.generate(model=model, prompt='', keep_alive=0)
-# """"""
