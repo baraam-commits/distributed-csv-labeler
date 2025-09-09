@@ -2,8 +2,10 @@ import ollama
 from Prosses_user_input import ProssesUserInput as PUI
 import json
 import re
-from typing import List, Tuple, Dict
-
+from typing import List, Tuple, Dict, Optional
+from calibration_api import auto_fit_and_save, load_manager
+import os
+import numpy as np
 
 # Examples for few-shot prompting, categorized by domain. 
 EXAMPLES: Dict[str, List[Tuple[str, dict]]] = {
@@ -60,9 +62,7 @@ EXAMPLES: Dict[str, List[Tuple[str, dict]]] = {
          {"search_needed": 1, "confidence": 0.95, "reason": "Rates update frequently"}),
     ],
 }
-
-
-
+# Default settings
 DEFAULT_EXAMPLES = EXAMPLES["general"]
 DEFAULT_SYSTEM_PROMPT = """
         You are a highly accurate text classifier.
@@ -78,9 +78,14 @@ DEFAULT_SYSTEM_PROMPT = """
         Decide if the input question REQUIRES an external web search.
 
         GUIDELINES:
-        - search_needed = 1 → fresh info (weather, revenue, leadership, news, schedules, etc.)
-        - search_needed = 0 → basic facts, definitions, arithmetic
-        - confidence = 1.0 only if trivial (e.g. 2+2)
+        - search_needed = 1 → fresh info (weather, revenue, leadership, news, schedules, etc.) **More Facts Needed:**
+        - search_needed = 0 → basic facts, definitions, arithmetic **Self-Contained Knowledge:**
+        -   **Confidence Score:**
+            -   `1.0`: Only for absolutely trivial cases (e.g., `2+2`).
+            -   `0.85-0.95`: For clear-cut cases that fit the guidelines perfectly.
+            -   `0.6-0.8`: For **borderline cases** where a basic answer is possible but a search would provide a much better, more detailed response, or if the user's intent is slightly unclear.
+            -   `< 0.6`: For **Very Low Confidence**. Use this for nonsensical input, random characters, or gibberish where the user's intent is impossible to determine.
+
 
         EXAMPLES:
         Q: define convolution in signal processing <ENT> entity: Signal Processing, type: ORG </ENT>
@@ -89,9 +94,16 @@ DEFAULT_SYSTEM_PROMPT = """
         Q: rare beauty annual revenue last year <ENT> entity: annual, type: DATE; entity: last year, type: DATE </ENT>
         A: {"search_needed":1,"confidence":0.92}
 
+        Q: `explain the history of computer science`
+        A: {"search_needed":1,"confidence":0.7}
+
+        Q: `how i.met your mother who is the mother`
+        A: {"search_needed":0,"confidence":0.6}
+        
         Q: what is 2 + 2? <ENT> </ENT>
         A: {"search_needed":0,"confidence":1.0}
     """
+
 # Iteratively tuned defaults for qwen2.5:0.5b-instruct for classification task
 DEFAULT_OPTIONS = {
     "format": "json", 
@@ -99,14 +111,15 @@ DEFAULT_OPTIONS = {
     "top_p": 0.51,
     "top_k": 3,
     "repeat_penalty": 1.1,
-    "num_thread": 6,
     "num_predict": 22,
     "raw": True
 }
 DEFAULT_MODEL = "qwen2.5:0.5b-instruct"
 
 class llmClassifier:
-    def __init__(self, model: str = DEFAULT_MODEL, system_prompt: str = DEFAULT_SYSTEM_PROMPT, options: dict = DEFAULT_OPTIONS):
+    def __init__(self, model: str = DEFAULT_MODEL, system_prompt: str = DEFAULT_SYSTEM_PROMPT,
+                    options: dict = DEFAULT_OPTIONS, gpu: Optional[str] = False,
+                    calib_path: str = "calibrators.json"):
         self.model = model
         self.system_prompt = system_prompt
         self.options = options or {}
@@ -114,7 +127,16 @@ class llmClassifier:
         self.pui = PUI()
         self.retry_attempts = 0  # Number of retry attempts for model query
         self.options.setdefault("raw", True)
+        if gpu:
+            self.options.setdefault("gpu_layers",-1)
         # Ensure the model is installed
+        self._ensure_model()
+        
+        self.calib_path = calib_path
+        self.mgr = self._init_calibrators()
+
+
+    def _ensure_model(self):
         try:
             print(f"Checking if model '{self.model}' is installed...")
             try:
@@ -129,67 +151,86 @@ class llmClassifier:
             print(f"Model '{self.model}' is ready to use.\n")     
         except Exception as e:
             raise RuntimeError(f"Failed to pull model '{self.model}': {e}")
+    def _init_calibrators(self):
+        # try load
+        if os.path.exists(self.calib_path):
+            try:
+                return load_manager(self.calib_path)
+            except Exception as e:
+                print(f"⚠️ Failed to load {self.calib_path}: {e}. Refitting…")
 
-
+        domain_to_csv = {
+            "general":     r"app\app_data\Calibration_data\general_labled.csv",
+            "programming": r"app\app_data\Calibration_data\programing_labled.csv",  # keep your path name; domain key standardized
+        }
+        mgr, report = auto_fit_and_save(
+            domain_to_csv,
+            out_path=self.calib_path,
+            prob_col="confidence",
+            label_col="search_needed",
+            pred_label_col=None,
+            prob_is_pos_class=True
+        )
+        print(report)
+        return mgr
+    
     def classify(self, user_input: str, domain_tag: str = "general"):
-        
         processed_input = self.pui.process_user_input(user_input)
 
-        if len(processed_input["tokenized"]) == 0:
-            # No valid input provided
+        if len(processed_input.get("tokenized", [])) == 0:
             return {"search_needed": 0, "confidence": 0.0}
-        elif len(processed_input["tokenized"]) > 512:
-            # Input too long for model reasoning -1 indicates too long
+        if len(processed_input["tokenized"]) > 512:
             return {"search_needed": 0, "confidence": 0.0}
 
         prompt = self._build_prompt(processed_input, domain_tag)
 
-        if self.options == None:
-                response = self.client.generate(model=self.model, prompt=prompt, system=self.system_prompt)
+        if self.options is None:
+            response = self.client.generate(model=self.model, prompt=prompt, system=self.system_prompt)
         else:
             response = self.client.generate(model=self.model, prompt=prompt, system=self.system_prompt, options=self.options)
 
         try:
-            if response["response"] is None:
+            if response.get("response") is None:
                 raise TypeError("No response from model")
 
             response_data = self._load_json_or_raise(response["response"])
 
-            if "search_needed" not in response_data:
-                raise KeyError("search_needed")
-            if "confidence" not in response_data:
-                raise KeyError("confidence")
+            if "search_needed" not in response_data: raise KeyError("search_needed")
+            if "confidence"   not in response_data: raise KeyError("confidence")
 
-            
-            self.retry_attempts = 0  # Reset retry attempts on success
+            # normalize types/ranges
+            response_data["search_needed"] = 1 if int(response_data["search_needed"]) >= 1 else 0
+            response_data["confidence"]    = max(0.0, min(1.0, float(response_data["confidence"])))
+            print(f"Raw confidence: {response_data['confidence']}", end="")
+            response_data["confidence"] = self.mgr.calibrate_confidence(domain_tag, response_data["confidence"])
+            print(f" calibrated: {response_data['confidence']}") # to high currently fix later
+            self.retry_attempts = 0
             return response_data
-        except (TypeError, KeyError) as e:
-            print(f"Error processing response for question '{processed_input['BERT_Input']}': {e}")
+
+        except (TypeError, KeyError, ValueError) as e:
+            print(f"Error processing response for '{processed_input.get('BERT_Input','<unknown>')}': {e}")
             print(f"Model output: {response}")
             self.retry_attempts += 1
             if self.retry_attempts < 3:
                 print(f"Retrying... Attempt {self.retry_attempts}")
-                return self.classify(user_input)
+                return self.classify(user_input, domain_tag=domain_tag)
             else:
-                print("Max retry attempts reached. Returning default response.")
                 self.retry_attempts = 0
-                # Standardized fallback response reasoning -2 indicated unable to classify
                 return {"search_needed": 0, "confidence": 0.0}
-            
-        except Exception as e:
-            print(f"Unexpected error for '{processed_input['BERT_Input']}': {e}")
-            print(f"Model output: {response["response"]}\n")
 
+        except Exception as e:
+            print(f"Unexpected error for '{processed_input.get('BERT_Input','<unknown>')}': {e}")
+            try:
+                print(f"Model raw: {response.get('response')}\n")
+            except Exception:
+                pass
             self.retry_attempts += 1
             if self.retry_attempts < 3:
                 print(f"Retrying... Attempt {self.retry_attempts}")
-                return self.classify(user_input)
+                return self.classify(user_input, domain_tag=domain_tag)
             else:
-                print("Max retry attempts reached. Returning default response.")
                 self.retry_attempts = 0
-                # Standardized fallback response reasoning -2 indicated unable to classify
                 return {"search_needed": 0, "confidence": 0.0}
-
 
     def _load_json_or_raise(self, text: str):
         """
@@ -382,6 +423,7 @@ class llmClassifier:
 
         Expects processed_input['BERT_Input'] to hold the normalized question text.
         """
+        # i have no idea why i added this import but it works so im leaving it
         import json as _json
 
         question = processed_input["BERT_Input"]

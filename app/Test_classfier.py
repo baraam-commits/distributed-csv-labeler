@@ -5,6 +5,7 @@ from Llm_classifer_script import llmClassifier as classifier
 import os
 import json
 import csv
+from typing import Optional, Dict, Any
 
 
 
@@ -49,7 +50,7 @@ labeled_questions = {
     "programming": {
         "I am having 4 different tables like select * from System select * from Set select * from Item select * from Versions Now for each system Id there will be n no.of Sets, and foe each set there qill be n no. of Items and for each item there will be n no. of Versions. each system has n no of set each Set has n no of Items each Item has n no of Versions So, Now when i give SystemId then i have to retrieve all the records from Set and Items of each set and Versions of each Items in single storedprocedure.": {"search_needed": 0, "confidence": 0.8},
         "I have two table m_master and tbl_appointment [This is tbl_appointment table][1] [This is m_master table][2]": {"search_needed": 0, "confidence": 0.76},
-        "I'm trying to extract US states from wiki URL, and for which I'm using Python Pandas. However, the above code is giving me an error ... installed html5lib and beautifulsoup4 as well, but it is not working.": {"search_needed": 0, "confidence": 0.78},
+        "I'm trying to extract US states from wiki URL, and for which I'm using Python Pandas. However, the above code is giving me an error [GENARIC ERROR HERE] installed html5lib and beautifulsoup4 as well, but it is not working.": {"search_needed": 0, "confidence": 0.78},
         "I'm so new to C#, I wanna make an application that can easily connect to the SqlServer database... my reader always gives Null": {"search_needed": 0, "confidence": 0.82},
         "basically i have this array ... if an element['sub'] appears twice ... both instances should be next to each other in the array (PHP)": {"search_needed": 0, "confidence": 0.84},
         "I am trying to make a constructor for a derived class. Error: no default constructor exists for class 'FirstClass'": {"search_needed": 0, "confidence": 0.88},
@@ -102,7 +103,7 @@ CSV_HEADERS = [
     "domains_json",
 ]
 
-def _flatten_labeled_data(labeled):
+def _flatten_labeled_data(labeled) -> list:
     items = []
     is_nested = all(
         isinstance(v, dict) and (not v or isinstance(next(iter(v.values())), dict))
@@ -114,12 +115,19 @@ def _flatten_labeled_data(labeled):
                 items.append((domain, q, lbl))
     else:
         for q, lbl in labeled.items():
-            items.append(("default", q, lbl))
+            items.append(("general", q, lbl))
     return items
 
-def _test_model(model, system_prompt, options, labeled_data):
+def _test_model(model, system_prompt: Optional[str] = None, options: Optional[dict] = None, labeled_data: Optional[dict] = labeled_questions, gpu: bool = False) -> dict:
     print("\n\n\n\n")
-    classifying_model = classifier(model, system_prompt, options)
+    args = []
+    if model is not None:
+        args.append(model)
+    if system_prompt is not None:
+        args.append(system_prompt)
+    if options is not None:
+        args.append(options)
+    classifying_model = classifier(*args, gpu=gpu)
 
     print(f"--- Testing {model} ---\n")
 
@@ -311,7 +319,7 @@ def _test_model(model, system_prompt, options, labeled_data):
     }
 
 
-def _append_metrics_csv(csv_path: str, metrics: dict):
+def _append_metrics_csv(csv_path: str, metrics: dict, fieldnames: list = CSV_HEADERS) -> None:
     # Ensure directory exists
     os.makedirs(os.path.dirname(csv_path) or ".", exist_ok=True)
     file_exists = os.path.isfile(csv_path)
@@ -338,7 +346,7 @@ def _append_metrics_csv(csv_path: str, metrics: dict):
     }
 
     with open(csv_path, "a", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
         writer.writerow(row)
@@ -380,7 +388,7 @@ and confidence without needing any extra code.
 
 System prompt has a defult value in llmClassifier.py but you can override it here if you want to test different prompts.
 """
-def run_and_log_all_tests(csv_path="results.csv", system_prompt: str = None):
+def run_and_log_model_param_tests(csv_path="results.csv", system_prompt: str = None) -> None:
 
     def test_qwen(system_prompt=None, options=None):
         model = "qwen2.5:0.5b-instruct"
@@ -456,9 +464,116 @@ def run_and_log_all_tests(csv_path="results.csv", system_prompt: str = None):
                 print(f"[WARN] {fn.__name__} failed: {e}")
 
 
-run_and_log_all_tests(csv_path="results2.csv")
+        """
+        results.csv will contain all the results for easy analysis in Excel or Sheets. for current method and 4 shot examples in LLM_Classifier.py
+        results2.csv will contain results for 2-shot with reasoning for classification
+        """
 
-"""
-results.csv will contain all the results for easy analysis in Excel or Sheets. for current method and 4 shot examples in LLM_Classifier.py
-results2.csv will contain results for 2-shot with reasoning for classification
-"""
+def log_discrepancies(
+    model: Optional[str] = None,
+    options: Optional[dict] = None,
+    results_path: str = "discrepancies.csv",
+    system_prompt: Optional[str] = None,
+) -> None:
+    """
+    Runs the classifier on the labeled_questions set and logs ONLY discrepancies
+    (pred != gold) to a CSV, one row per discrepancy.
+
+    Columns:
+      timestamp, model, domain, question,
+      gold_search_needed, gold_confidence,
+      pred_search_needed, pred_confidence,
+      delta_conf, abs_delta_conf,
+      options_json
+    """
+    # Build classifier (most implementations expect (model, system_prompt, options))
+
+    args = []
+    if model is not None:
+        args.append(model)
+    if system_prompt is not None:
+        args.append(system_prompt)
+    if options is not None:
+        args.append(options)
+    clf = classifier(*args,gpu=True)
+
+    # Prepare CSV
+    fieldnames = [
+        "timestamp",
+        "model",
+        "domain",
+        "question",
+        "gold_search_needed",
+        "gold_confidence",
+        "pred_search_needed",
+        "pred_confidence",
+        "delta_conf",
+        "abs_delta_conf",
+        "options_json",
+    ]
+    # Create file and header if needed
+    try:
+        file_exists = False
+        try:
+            with open(results_path, "r", encoding="utf-8") as _:
+                file_exists = True
+        except FileNotFoundError:
+            file_exists = False
+
+        with open(results_path, "a", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=fieldnames)
+            if not file_exists:
+                w.writeheader()
+
+            # Iterate labeled data
+            dataset = _flatten_labeled_data(labeled_questions)
+            for domain, question, gold in dataset:
+                ts = time.strftime("%Y-%m-%d %H:%M:%S")
+                try:
+                    result: Dict[str, Any] = clf.classify(question)
+                    if not isinstance(result, dict):
+                        # Skip malformed returns
+                        continue
+                    pred_need = result.get("search_needed", None)
+                    pred_conf = result.get("confidence", None)
+
+                    gold_need = gold.get("search_needed", None)
+                    gold_conf = gold.get("confidence", 0.0)
+
+                    # Only log discrepancies where labels differ and prediction is usable
+                    if pred_need is None or gold_need is None:
+                        continue
+                    if pred_need != gold_need:
+                        continue
+
+                    # Confidence deltas (handle None safely)
+                    try:
+                        delta = float(pred_conf) - float(gold_conf)
+                    except (TypeError, ValueError):
+                        delta = 0.0
+                    abs_delta = abs(delta)
+
+                    w.writerow({
+                        "timestamp": ts,
+                        "model": model,
+                        "domain": domain,
+                        "question": question,
+                        "gold_search_needed": gold_need,
+                        "gold_confidence": gold_conf if isinstance(gold_conf, (int, float)) else 0.0,
+                        "pred_search_needed": pred_need,
+                        "pred_confidence": pred_conf if isinstance(pred_conf, (int, float)) else 0.0,
+                        "delta_conf": f"{delta:.6f}",
+                        "abs_delta_conf": f"{abs_delta:.6f}",
+                        "options_json": json.dumps(options or {}, ensure_ascii=False),
+                    })
+
+                except Exception as e:
+                    # Keep going on per-item failures
+                    print(f"[WARN] Failed on question (domain='{domain}'): {e}")
+
+    except Exception as e:
+        print(f"[ERROR] Could not write discrepancies CSV '{results_path}': {e}")
+        
+
+# log_discrepancies()
+_test_model("qwen2.5:0.5b-instruct", gpu=True)
