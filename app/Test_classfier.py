@@ -577,3 +577,4 @@ def log_discrepancies(
 
 # log_discrepancies()
 _test_model("qwen2.5:0.5b-instruct", gpu=True)
+# _test_model("gemma3:270m", gpu=True)

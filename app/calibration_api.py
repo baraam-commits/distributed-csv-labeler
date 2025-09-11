@@ -7,51 +7,64 @@ from sklearn.metrics import log_loss
 from sklearn.model_selection import train_test_split
 
 # ---------- math utils ----------
-EPS = 1e-6
-def _clip(p): return np.clip(p, EPS, 1 - EPS)
-def logit(p): p=_clip(p); return np.log(p) - np.log(1 - p)
-def sigmoid(z): return 1 / (1 + np.exp(-z))
+EPS = 1e-3  # slightly larger to tame extreme logits near 0/1
+def _clip(p): 
+    return np.clip(np.asarray(p, dtype=float), EPS, 1 - EPS)
+
+def logit(p):
+    p = _clip(p)
+    return np.log(p) - np.log(1 - p)
+
+def sigmoid(z): 
+    z = np.asarray(z, dtype=float)
+    return 1.0 / (1.0 + np.exp(-z))
 
 # ---------- single calibrator ----------
 @dataclass
 class CalibratorParams:
-    method: str                   # "temperature" or "platt"
+    method: str                   # "temperature", "temperature_down", or "platt"
     T: float | None = None        # for temperature
     a: float | None = None        # for platt (slope)
     b: float | None = None        # for platt (bias)
 
+ALLOW_PLATT = True #Has a tendency to bump up confidence far too much
+TEMP_DOWN_PARAM = (1.0, 50.0, 500)
+TEMP_PARAM = (0.2, 5.0, 300)
 class ConfidenceCalibrator:
     """
-    One calibrator (global OR per-domain).
-    method="temperature": single parameter T
-    method="platt": logistic regression on logit(p)
+    method="temperature_down"  -> temperature with T >= 1 (only pulls probs toward 0.5)
+    method="temperature"       -> unconstrained temperature (T in [0.2,5])
+    method="platt"             -> logistic regression on logit(p)
     """
-    def __init__(self, method: str = "temperature"):
-        assert method in ("temperature", "platt")
+
+    def __init__(self, method: str = "temperature_down"):
+        assert method in ("temperature", "temperature_down", "platt")
         self.method = method
         self.params = CalibratorParams(method=method)
-        self._lr = None  # sklearn model, only for platt
+        self._lr: LogisticRegression | None = None  # only used for platt
 
-    def fit(self, p_raw: np.ndarray, y: np.ndarray):
-        p_raw = _clip(np.asarray(p_raw, dtype=float))
+    def fit(self, p_raw, y):
+        p_raw = _clip(p_raw)
         y = np.asarray(y, dtype=int)
 
-        if self.method == "temperature":
-            self.params.T = self._fit_temperature(p_raw, y)
-        else:
+        if self.method == "temperature_down":
+            self.params.T = self._fit_temperature(p_raw, y, grid=TEMP_DOWN_PARAM)  # T>=1 only
+        elif self.method == "temperature":
+            self.params.T = self._fit_temperature(p_raw, y, grid=TEMP_PARAM)
+        else:  # platt
             self._lr = self._fit_platt(p_raw, y)
             self.params.a = float(self._lr.coef_.ravel()[0])
             self.params.b = float(self._lr.intercept_.ravel()[0])
         return self
 
-    def calibrate(self, p_raw: np.ndarray) -> np.ndarray:
-        p_raw = _clip(np.asarray(p_raw, dtype=float))
-        if self.method == "temperature":
+    def calibrate(self, p_raw):
+        p_raw = _clip(p_raw)
+        if self.method in ("temperature", "temperature_down"):
             if self.params.T is None:
                 raise RuntimeError("Temperature scaler not fitted.")
             return sigmoid(logit(p_raw) / self.params.T)
-        else:
-            if self.params.a is None or self.params.b is None:
+        else:  # platt
+            if (self.params.a is None) or (self.params.b is None):
                 raise RuntimeError("Platt scaler not fitted.")
             z = self.params.a * logit(p_raw) + self.params.b
             return sigmoid(z)
@@ -71,7 +84,9 @@ class ConfidenceCalibrator:
 
     def _fit_platt(self, p_raw, y):
         X = logit(p_raw).reshape(-1, 1)
-        lr = LogisticRegression(C=1.0, solver="lbfgs")
+        lr = LogisticRegression(
+            C=0.1, class_weight="balanced", solver="lbfgs", max_iter=1000
+        )
         lr.fit(X, y)
         return lr
 
@@ -82,20 +97,16 @@ class ConfidenceCalibrator:
     def from_dict(cls, d: dict):
         cal = cls(method=d["method"])
         cal.params = CalibratorParams(**d)
+        # platt params are stored in params; we don't reconstruct sklearn model for inference
         return cal
-
 
 # ---------- manager for domains + IO ----------
 class CalibrationManager:
-    """
-    Handles: loading CSVs, building P(y=1), fitting per-domain and global calibrators,
-    saving/loading params, and serving calibrated confidences via `calibrate`.
-    """
-    def __init__(self, method: str = "temperature"):
-        assert method in ("temperature", "platt")
+    def __init__(self, method: str = "temperature_down"):
         self.method = method
         self.global_cal = ConfidenceCalibrator(method=method)
         self.domain_cals: dict[str, ConfidenceCalibrator] = {}
+        self.domain_shrink: dict[str | None, float] = {}  # domain -> lambda
 
     # ---- data loading helpers ----
     @staticmethod
@@ -109,68 +120,109 @@ class CalibrationManager:
         """
         Returns p_raw (probabilities for y=1) and y (0/1).
         - If pred_label_col is provided and prob_is_pos_class=False,
-          we assume 'prob_col' is confidence of the *predicted class* and we convert to P(y=1)
+          'prob_col' is confidence of the *predicted class*; convert to P(y=1)
           by p = conf if pred_label==1 else (1-conf).
-        - If prob_is_pos_class=True, we assume 'prob_col' already is P(y=1).
+        - If prob_is_pos_class=True, 'prob_col' already is P(y=1).
         """
-        y = df[label_col].astype(int).to_numpy()
-        conf = df[prob_col].astype(float).to_numpy()
+        df = df.copy()
+        df.columns = [c.strip() for c in df.columns]
+        if prob_col not in df.columns or label_col not in df.columns:
+            raise ValueError(f"Missing required columns '{prob_col}' or '{label_col}'. Got: {df.columns.tolist()}")
+
+        # Label -> 0/1 robustly
+        lab = df[label_col].astype(str).str.strip().str.lower()
+        mapping = {"1":1,"0":0,"true":1,"false":0,"yes":1,"no":0,"y":1,"n":0}
+        y = pd.to_numeric(lab.map(mapping), errors="coerce")
+
+        # Probabilities -> numeric in [0,1]
+        conf = pd.to_numeric(df[prob_col], errors="coerce")
+
+        mask = y.isin([0,1]) & conf.notna() & conf.between(0.0, 1.0, inclusive="both")
+        kept = int(mask.sum()); dropped = int((~mask).sum())
+        if dropped:
+            print(f"[CAL] Dropping {dropped} invalid rows in '{label_col}'/'{prob_col}'")
+        if kept == 0:
+            raise ValueError("No valid rows after cleaning.")
+
+        y = y[mask].astype(int).to_numpy()
+        conf = conf[mask].to_numpy(dtype=float)
 
         if pred_label_col and not prob_is_pos_class:
-            pred = df[pred_label_col].astype(int).to_numpy()
-            p_raw = np.where(pred == 1, conf, 1.0 - conf)
+            pred = pd.to_numeric(df.loc[mask, pred_label_col], errors="coerce")
+            pred = pred.where(pred.isin([0, 1]))
+            m2 = pred.notna()
+            y = y[m2.to_numpy()]
+            conf = conf[m2.to_numpy()]
+            pred = pred[m2]
+            p_raw = np.where(pred.to_numpy(dtype=int) == 1, conf, 1.0 - conf)
         else:
             p_raw = conf  # already P(y=1)
 
         return _clip(p_raw), y
 
-    # ---- fitting ----
+    # ---- fitting from CSVs (optional path) ----
     def fit_from_csvs(
         self,
         domain_to_csv: dict[str, str],
-        prob_col: str = "confidence",     # your file spelling
-        label_col: str = "search_needed", # your gold label
+        prob_col: str = "confidence",
+        label_col: str = "search_needed",
         pred_label_col: str | None = None,
         prob_is_pos_class: bool = True,
     ):
-        """
-        Fit per-domain calibrators and a global calibrator from CSVs.
-        Assumes each CSV has at least [prob_col, label_col].
-        If you also have predicted labels and 'prob_col' is "confidence for predicted class",
-        set pred_label_col="pred_label" (or whatever your column is) and prob_is_pos_class=False.
-        """
-        # Load per-domain
-        domain_data = {}
+        domain_data: dict[str, tuple[np.ndarray, np.ndarray]] = {}
         for dom, path in domain_to_csv.items():
             df = pd.read_csv(path)
-            if prob_col not in df.columns or label_col not in df.columns:
-                raise ValueError(f"{path} must have columns '{prob_col}' and '{label_col}'")
             p_raw, y = self._build_probs(df, prob_col, label_col, pred_label_col, prob_is_pos_class)
             domain_data[dom] = (p_raw, y)
 
-        # Fit per-domain
+        # per-domain
         self.domain_cals = {}
         for dom, (p_raw, y) in domain_data.items():
-            cal = ConfidenceCalibrator(self.method).fit(p_raw, y)
-            self.domain_cals[dom] = cal
+            self.domain_cals[dom] = ConfidenceCalibrator(self.method).fit(p_raw, y)
 
-        # Fit global on union
+        # global
         all_p = np.concatenate([v[0] for v in domain_data.values()])
         all_y = np.concatenate([v[1] for v in domain_data.values()])
         self.global_cal.fit(all_p, all_y)
         return self
 
     # ---- inference ----
-    def calibrate(self, domain: str | None, probs: np.ndarray) -> np.ndarray:
-        """
-        Calibrate a vector of probabilities (assumed to be P(y=1)).
-        If domain calibrator is missing, falls back to global.
-        """
-        probs = _clip(np.asarray(probs, dtype=float))
+    def _apply_shrink(self, p: np.ndarray, lam: float) -> np.ndarray:
+        lam = float(np.clip(lam, 0.0, 1.0))
+        if lam <= 1e-8:
+            return p
+        p = np.asarray(p, dtype=float)
+        mask = (p < 1.0)  # keep exact 1.0 untouched
+        p2 = p.copy()
+        p2[mask] = (1.0 - lam) * p[mask] + lam * 0.5
+        return p2
+
+    def calibrate(self, domain: str | None, probs) -> np.ndarray:
+        probs = _clip(probs)
         cal = self.domain_cals.get(domain, self.global_cal)
-        return cal.calibrate(probs)
+        out = cal.calibrate(probs)
+
+        # --- NEW: never-up guard (except exact 1.0 preserved) ---
+        out = np.asarray(out, dtype=float)
+        probs_arr = np.asarray(probs, dtype=float)
+
+        # keep exact 1.0 as exactly 1.0
+        at_one = (probs_arr >= 1.0)
+        out[at_one] = 1.0
+
+        # for everything else, do not allow increases
+        not_one = ~at_one
+        out[not_one] = np.minimum(out[not_one], probs_arr[not_one])
+
+        # domain shrink toward 0.5
+        lam = self.domain_shrink.get(domain, 0.0)
+        out = self._apply_shrink(out, lam)
+        return out
+
 
     def calibrate_confidence(self, domain: str, confidence: float) -> float:
+        if confidence == 1.0:
+            return 1.0
         return float(np.asarray(self.calibrate(domain, confidence)).ravel()[0])
 
     # ---- persistence ----
@@ -179,6 +231,7 @@ class CalibrationManager:
             "method": self.method,
             "global": self.global_cal.to_dict(),
             "domains": {k: v.to_dict() for k, v in self.domain_cals.items()},
+            "domain_shrink": self.domain_shrink,
         }
         with open(path, "w", encoding="utf-8") as f:
             json.dump(obj, f, ensure_ascii=False, indent=2)
@@ -190,52 +243,76 @@ class CalibrationManager:
         mgr = cls(method=obj["method"])
         mgr.global_cal = ConfidenceCalibrator.from_dict(obj["global"])
         mgr.domain_cals = {k: ConfidenceCalibrator.from_dict(v) for k, v in obj["domains"].items()}
+        mgr.domain_shrink = obj.get("domain_shrink", {})
         return mgr
-    
-# ---- add this below the classes in calibration_api.py ----
-import numpy as np
-from sklearn.model_selection import train_test_split
 
-def _ece(y_true, p_pred, n_bins=10):
-    y_true = np.asarray(y_true).astype(int)
-    p_pred = _clip(np.asarray(p_pred))
-    bins = np.linspace(0,1,n_bins+1)
+# ---------- metrics & model selection ----------
+def _ece(y_true, p_pred, n_bins: int = 10):
+    y_true = np.asarray(y_true, dtype=int)
+    p_pred = _clip(p_pred)
+    bins = np.linspace(0.0, 1.0, n_bins + 1)
     e = 0.0; n = len(y_true)
     for i in range(n_bins):
         lo, hi = bins[i], bins[i+1]
-        idx = (p_pred >= lo) & (p_pred < hi) if i < n_bins-1 else (p_pred >= lo) & (p_pred <= hi)
-        if not np.any(idx): 
+        idx = (p_pred >= lo) & (p_pred < hi) if i < n_bins - 1 else (p_pred >= lo) & (p_pred <= hi)
+        if not np.any(idx):
             continue
         acc = y_true[idx].mean()
         conf = p_pred[idx].mean()
-        e += (idx.sum()/n) * abs(acc - conf)
+        e += (idx.sum() / n) * abs(acc - conf)
     return e
 
 def _fit_select_one(p, y):
-    """Return ('temperature' or 'platt', fitted_calibrator, metrics_dict)."""
-    # split once (stratified)
-    y = np.asarray(y).astype(int)
-    p = _clip(np.asarray(p))
-    Xtr, Xte, ytr, yte = train_test_split(p, y, test_size=0.2, stratify=y, random_state=42)
+    """Return (method_name, fitted_calibrator, metrics_dict)."""
+    y = np.asarray(y, dtype=int)
+    p = _clip(p)
+    n = len(y)
+    if not ALLOW_PLATT:
+        calT = ConfidenceCalibrator("temperature_down").fit(p, y)
+        pT = calT.calibrate(p)
+        return "temperature_down", calT, {"logloss": log_loss(y, _clip(pT)), "ece": _ece(y, pT), "bias": abs(pT.mean() - y.mean()), "note": "forced_tempdown"}
+    classes = np.unique(y)
 
-    # Temperature
-    cal_T = ConfidenceCalibrator("temperature").fit(Xtr, ytr)
-    pT = cal_T.calibrate(Xte)
-    llT = log_loss(yte, _clip(pT))
-    eT  = _ece(yte, pT)
+    # fallback if split impossible
+    def _compare_on(arr_p, arr_y):
+        calT = ConfidenceCalibrator("temperature_down").fit(arr_p, arr_y)
+        pT = calT.calibrate(arr_p); llT = log_loss(arr_y, _clip(pT)); eT = _ece(arr_y, pT)
+        calP = ConfidenceCalibrator("platt").fit(arr_p, arr_y)
+        pP = calP.calibrate(arr_p); llP = log_loss(arr_y, _clip(pP)); eP = _ece(arr_y, pP)
+        prev = arr_y.mean()
+        biasT = abs(pT.mean() - prev); biasP = abs(pP.mean() - prev)
+        lam = 5.0
+        scoreT = llT + lam * (biasT ** 2)
+        scoreP = llP + lam * (biasP ** 2)
+        if scoreT <= scoreP:
+            return "temperature_down", calT, {"logloss": llT, "ece": eT, "bias": biasT, "note": "no_split"}
+        else:
+            return "platt", calP, {"logloss": llP, "ece": eP, "bias": biasP, "note": "no_split"}
 
-    # Platt
-    cal_P = ConfidenceCalibrator("platt").fit(Xtr, ytr)
-    pP = cal_P.calibrate(Xte)
-    llP = log_loss(yte, _clip(pP))
-    eP  = _ece(yte, pP)
+    if (n < 10) or (len(classes) < 2):
+        return _compare_on(p, y)
 
-    # pick by log loss, tie-break ECE
-    if (llT < llP) or (abs(llT-llP) < 1e-6 and eT <= eP):
-        return "temperature", ConfidenceCalibrator("temperature").fit(p, y), {"logloss": llT, "ece": eT}
+    try:
+        Xtr, Xte, ytr, yte = train_test_split(p, y, test_size=0.2, stratify=y, random_state=42)
+    except Exception:
+        return _compare_on(p, y)
+
+    # evaluate on held-out
+    calT = ConfidenceCalibrator("temperature_down").fit(Xtr, ytr)
+    pT = calT.calibrate(Xte); llT = log_loss(yte, _clip(pT)); eT = _ece(yte, pT); biasT = abs(pT.mean() - y.mean())
+    calP = ConfidenceCalibrator("platt").fit(Xtr, ytr)
+    pP = calP.calibrate(Xte); llP = log_loss(yte, _clip(pP)); eP = _ece(yte, pP); biasP = abs(pP.mean() - y.mean())
+
+    lam = 5.0  # penalize deviation from prevalence (calibration-in-the-large)
+    scoreT = llT + lam * (biasT ** 2)
+    scoreP = llP + lam * (biasP ** 2)
+
+    if scoreT <= scoreP:
+        return "temperature_down", ConfidenceCalibrator("temperature_down").fit(p, y), {"logloss": llT, "ece": eT, "bias": biasT}
     else:
-        return "platt", ConfidenceCalibrator("platt").fit(p, y), {"logloss": llP, "ece": eP}
+        return "platt", ConfidenceCalibrator("platt").fit(p, y), {"logloss": llP, "ece": eP, "bias": biasP}
 
+# ---------- high-level API ----------
 def auto_fit_and_save(
     domain_to_csv: dict[str, str],
     out_path: str = "calibrators.json",
@@ -245,25 +322,21 @@ def auto_fit_and_save(
     prob_is_pos_class: bool = True,
 ):
     """
-    1) Loads each domain CSV
-    2) Builds p_raw (as P(y=1)) and y
-    3) Auto-selects method per domain (temperature vs platt) via 80/20 split
-    4) Also selects a global method on pooled data
-    5) Saves everything to out_path
+    1) Load each domain CSV and build (p_raw, y)
+    2) Auto-select method per domain (temperature_down vs platt) via held-out split
+    3) Do the same for global
+    4) Compute per-domain shrink lambda to hit target means
+    5) Save manager to out_path and return (mgr, report)
     """
     # collect per-domain data
-    per_dom = {}
+    per_dom: dict[str, tuple[np.ndarray, np.ndarray]] = {}
     for dom, path in domain_to_csv.items():
         df = pd.read_csv(path)
-        if prob_col not in df.columns or label_col not in df.columns:
-            raise ValueError(f"{path} must have '{prob_col}' and '{label_col}' columns")
-        p_raw, y = CalibrationManager._build_probs(
-            df, prob_col, label_col, pred_label_col, prob_is_pos_class
-        )
+        p_raw, y = CalibrationManager._build_probs(df, prob_col, label_col, pred_label_col, prob_is_pos_class)
         per_dom[dom] = (p_raw, y)
 
     # per-domain selection
-    chosen = {}
+    chosen: dict[str, tuple[str, ConfidenceCalibrator, dict]] = {}
     for dom, (p, y) in per_dom.items():
         m, cal, metrics = _fit_select_one(p, y)
         chosen[dom] = (m, cal, metrics)
@@ -278,16 +351,43 @@ def auto_fit_and_save(
     mgr.global_cal = cal_glob
     mgr.domain_cals = {dom: cal for dom, (_, cal, _) in chosen.items()}
 
+    # target means (accept both spellings for programming)
+    TARGET = {"programming": 0.64, "programing": 0.64, "general": 0.56}
+
+    # compute per-domain shrink λ to hit targets (preserving 1.0)
+    mgr.domain_shrink = {}
+    for dom, (p, _y) in per_dom.items():
+        cal = chosen[dom][1]
+        p_cal = np.asarray(cal.calibrate(_clip(p)), dtype=float)
+        mean_cal = float(np.mean(p_cal))
+        target = TARGET.get(dom, 0.58)
+        if mean_cal > 0.5:
+            lam = np.clip((mean_cal - target) / max(mean_cal - 0.5, 1e-6), 0.0, 1.0)
+        else:
+            lam = 0.0
+        mgr.domain_shrink[dom] = float(lam)
+
+    # global fallback shrink (optional)
+    p_all_cal = np.concatenate([mgr.domain_cals[dom].calibrate(_clip(per_dom[dom][0])) for dom in per_dom.keys()])
+    mean_all = float(np.mean(p_all_cal))
+    if mean_all > 0.5:
+        lam_g = np.clip((mean_all - 0.58)/max(mean_all - 0.5, 1e-6), 0.0, 1.0)
+    else:
+        lam_g = 0.0
+    mgr.domain_shrink[None] = float(lam_g)
+
     # save
     mgr.save(out_path)
 
     # compact report
     report = {
-        "global": {"method": m_glob, **glob_metrics},
-        "domains": {dom: {"method": m, **metrics} for dom, (m, _, metrics) in chosen.items()}
+        "global": {"method": m_glob, **glob_metrics, "shrink_lambda": mgr.domain_shrink.get(None, 0.0)},
+        "domains": {
+            dom: {"method": m, **metrics, "shrink_lambda": mgr.domain_shrink.get(dom, 0.0)}
+            for dom, (m, _, metrics) in chosen.items()
+        }
     }
     return mgr, report
 
 def load_manager(path: str) -> CalibrationManager:
     return CalibrationManager.load(path)
-

@@ -1,23 +1,28 @@
 {
-  "method": "platt",
+  "method": "temperature_down",
   "global": {
-    "method": "platt",
-    "T": null,
-    "a": 1.2255081503211411,
-    "b": -1.8988981015867843
+    "method": "temperature_down",
+    "T": 1.1224505680853065,
+    "a": null,
+    "b": null
   },
   "domains": {
     "general": {
-      "method": "platt",
-      "T": null,
-      "a": 5.954252240648617,
-      "b": -6.633729309303195
+      "method": "temperature_down",
+      "T": 1.0,
+      "a": null,
+      "b": null
     },
-    "programing": {
-      "method": "platt",
-      "T": null,
-      "a": -1.5491258309277867,
-      "b": 2.9239821797024335
+    "programming": {
+      "method": "temperature_down",
+      "T": 10.000000000000002,
+      "a": null,
+      "b": null
     }
+  },
+  "domain_shrink": {
+    "general": 0.25379924880058347,
+    "programming": 0.0,
+    "null": 0.0
   }
 }

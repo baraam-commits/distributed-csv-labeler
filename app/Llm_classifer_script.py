@@ -21,9 +21,9 @@ EXAMPLES: Dict[str, List[Tuple[str, dict]]] = {
     ],
     "programming": [
         ("I'm having trouble understanding and using Django's ImageField",
-         {"search_needed": 0, "confidence": 0.86, "reason": "Framework usage; standard docs"}),
+         {"search_needed": 0, "confidence": 0.7, "reason": "Framework usage; standard docs"}),
         ("error: spawn EACCES in gulp pipeline",
-         {"search_needed": 0, "confidence": 0.85, "reason": "Common permission error"}),
+         {"search_needed": 0, "confidence": 0.6, "reason": "Common permission error"}),
         ("how to split a git history based on a target directory",
          {"search_needed": 1, "confidence": 0.9, "reason": "Niche workflow; requires lookup"}),
         ("what is the latest stable pytorch version",
@@ -49,15 +49,15 @@ EXAMPLES: Dict[str, List[Tuple[str, dict]]] = {
     ],
     "general": [
         ("who is the ceo of openai",
-         {"search_needed": 1, "confidence": 0.9, "reason": "Leadership role changes"}),
+         {"search_needed": 1, "confidence": 0.85, "reason": "Leadership role changes"}),
         ("weather in nyc tomorrow?",
          {"search_needed": 1, "confidence": 0.96, "reason": "Forecast requires fresh data"}),
         ("define convolution in signal processing",
-         {"search_needed": 0, "confidence": 0.85, "reason": "Standard academic definition"}),
+         {"search_needed": 0, "confidence": 0.75, "reason": "Standard academic definition"}),
         ("rare beauty annual revenue last year",
-         {"search_needed": 1, "confidence": 0.92, "reason": "Financial figures change annually"}),
+         {"search_needed": 1, "confidence": 0.82, "reason": "Financial figures change annually"}),
         ("is the empire state building taller than the shard?",
-         {"search_needed": 0, "confidence": 0.88, "reason": "Static building heights"}),
+         {"search_needed": 0, "confidence": 0.6, "reason": "Static building heights"}),
         ("what are the current us interest rates",
          {"search_needed": 1, "confidence": 0.95, "reason": "Rates update frequently"}),
     ],
@@ -65,44 +65,47 @@ EXAMPLES: Dict[str, List[Tuple[str, dict]]] = {
 # Default settings
 DEFAULT_EXAMPLES = EXAMPLES["general"]
 DEFAULT_SYSTEM_PROMPT = """
-        You are a highly accurate text classifier.
+        You are a highly accurate text classifier whos is very very good at your job.
 
         Output must be exactly ONE line of JSON with this schema, no extra text, no spaces:
         {"search_needed":0,"confidence":1.0}
-
         FIELDS:
         - "search_needed": 1 (search needed) or 0 (no search needed)
-        - "confidence": float between 0.0 and 1.0
-
+        - "confidence": float 0.0–1.0 (how sure you are of the label)
+        CONFIDENCE POLICY:
+        - start from a baseline of 0.25
+        - adjust up or down in increments of 0.05 or 0.10 based on certainty
         TASK:
-        Decide if the input question REQUIRES an external web search.
+        Decide if the input question benifits from external information 
 
         GUIDELINES:
         - search_needed = 1 → fresh info (weather, revenue, leadership, news, schedules, etc.) **More Facts Needed:**
         - search_needed = 0 → basic facts, definitions, arithmetic **Self-Contained Knowledge:**
         -   **Confidence Score:**
-            -   `1.0`: Only for absolutely trivial cases (e.g., `2+2`).
-            -   `0.85-0.95`: For clear-cut cases that fit the guidelines perfectly.
-            -   `0.6-0.8`: For **borderline cases** where a basic answer is possible but a search would provide a much better, more detailed response, or if the user's intent is slightly unclear.
-            -   `< 0.6`: For **Very Low Confidence**. Use this for nonsensical input, random characters, or gibberish where the user's intent is impossible to determine.
+            -   `1.0`: Only for absolutely trivial cases (e.g., `2+2`). MOSTLY LIKELY NOT 1
+            -   `0.65-0.75`: For clear-cut cases that fit the guidelines perfectly.
+            -   `0.4-0.6`: For **borderline cases** where a basic answer is possible but a search would provide a much better, more detailed response, or if the user's intent is slightly unclear.
+            -   `0-0.2`: For **Very Low Confidence**. Use this for nonsensical input, random characters, or gibberish where the user's intent is impossible to determine.
 
 
         EXAMPLES:
         Q: define convolution in signal processing <ENT> entity: Signal Processing, type: ORG </ENT>
-        A: {"search_needed":0,"confidence":0.85}
+        A: {"search_needed":0,"confidence":0.65}
 
         Q: rare beauty annual revenue last year <ENT> entity: annual, type: DATE; entity: last year, type: DATE </ENT>
-        A: {"search_needed":1,"confidence":0.92}
+        A: {"search_needed":1,"confidence":0.72}
 
         Q: `explain the history of computer science`
-        A: {"search_needed":1,"confidence":0.7}
+        A: {"search_needed":1,"confidence":0.5}
 
         Q: `how i.met your mother who is the mother`
-        A: {"search_needed":0,"confidence":0.6}
+        A: {"search_needed":0,"confidence":0.4}
         
         Q: what is 2 + 2? <ENT> </ENT>
         A: {"search_needed":0,"confidence":1.0}
     """
+
+
 
 # Iteratively tuned defaults for qwen2.5:0.5b-instruct for classification task
 DEFAULT_OPTIONS = {
@@ -451,22 +454,19 @@ class llmClassifier:
     - 1 means search needed, 0 means not needed. return as integer.
     - Output ONLY valid JSON with fields EXACTLY as specified:
     - "search_needed": 1 or 0
-    - "confidence": float 0.0–1.0
+    - "confidence": float between 0 and 0.7
 
     RULES:
     - DO NOT include any field other than the two specified.
     - Ignore any 'Reason:' lines in the examples; they are for illustration only.
-    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {{"search_needed":0,"confidence":1.0}}
+    - KEEP FORMAT CONSISTENT. ONE line ONLY. THIS EXACT SCHEMA. {{"search_needed":0,"confidence":0.2}}
     - Heuristics:
     - 1: needs fresh or volatile info (weather, news, prices, schedules, leadership, “latest”, “current”, release dates).
     - 0: stable facts, definitions, math, basic programming or best-practice guidance you can answer without lookup.
-    - Confidence: use 1.0 only if trivial.
-
+    - Confidence: start at 0.50, adjust up/down in 0.05 or 0.10 increments based on certainty.
     Examples ({domain_tag} domain; closest in length to the input):
     {examples_str}
 
     Now classify this:
     {question}
-    A:""".strip()
-
-
+    A(PICK THE CORRECT CLASSIFICATION BUT PICK A LOWER CONFIDANCE SCORE):""".strip()
