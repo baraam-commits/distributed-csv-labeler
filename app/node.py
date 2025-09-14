@@ -6,6 +6,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import uvicorn
 import signal
+from Llm_classifer_script import llmClassifier as classifier
+# Custom LLM classifer api, constructor needs no arugments at initlization (unless gpu is enabled) call with classifer.classify(question , domain-defult is general)
+# returns dict with {"search_needed": int 0 or 1, "confidence": float 0-1.0}
 
 # ---------------- Tunables via env ----------------
 DEFAULT_BATCH = int(os.getenv("BATCH", "128"))
@@ -41,27 +44,31 @@ os.makedirs(REPL_DIR,   exist_ok=True)
 RESULTS_BASENAME = f"labels_{WORKER_ID.replace(':','_')}"
 STATE_PATH       = os.path.join(STATE_DIR,  f"state_{WORKER_ID.replace(':','_')}.json")
 
+clf = classifier(gpu = True)
 # -------------- Graceful stop ---------------------
 stop_flag = {"stop": False}
 def handle_sig(*_): stop_flag["stop"] = True
 signal.signal(signal.SIGINT, handle_sig)
 signal.signal(signal.SIGTERM, handle_sig)
 
-# -------------- Load CSV --------------------------
-DATA: List[Dict[str,str]] = []
+# -------------- Load CSV ---------------------
+DATA: List[Dict[str, str]] = []
 try:
     with open(CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        if "text" not in reader.fieldnames:
+        if "text" not in (reader.fieldnames or []):
             print("CSV must have a 'text' column.", file=sys.stderr); sys.exit(1)
+        has_domain = "domain" in (reader.fieldnames or [])
         for row in reader:
             txt = (row["text"] or "").strip()
+            dom = (row["domain"] or "").lower() if has_domain else None
             _id = hashlib.sha1(txt.encode("utf-8")).hexdigest()
-            DATA.append({"id": _id, "text": txt})
+            DATA.append({"id": _id, "text": txt, "domain": dom})
 except FileNotFoundError:
     print(f"CSV not found at {CSV_PATH}", file=sys.stderr); sys.exit(1)
+
 N = len(DATA)
-print(f"[{WORKER_ID}] loaded {N} rows")
+print(f"[{WORKER_ID}] loaded {N} rows (domain col present: {has_domain})")
 
 # -------------- State -----------------------------
 state_lock = threading.Lock()
@@ -254,16 +261,28 @@ def process_range(start: int, end: int):
         for idx in range(start, end + 1):
             rec = DATA[idx]
             txt = rec["text"]
-            # TODO: replace with your real LLM/rules
-            label = "search" if ("?" in txt or any(k in txt.lower() for k in [" who"," when"," where"," what"," define "])) else "no-search"
-            conf = 0.9 if label == "search" else 0.8
-            
+            dom = rec["domain"]
+
+            # If domain is present, pass it; else call without
+            result = clf.classify(txt, dom) if dom else clf.classify(txt)
+
+            label_id  = int(result.get("search_needed", 0))
+            confidence = float(result.get("confidence", 0.5))
+            label     = "search" if label_id == 1 else "no-search"
+
             out.write(json.dumps({
-                "id": rec["id"], "idx": idx,
-                "label": label, "confidence": conf,
-                "worker": WORKER_ID, "ts": time.time()
+                "id": rec["id"],
+                "idx": idx,
+                "text": txt,
+                "domain": dom or "general",  # fill in for consistency
+                "label": label,
+                "label_id": label_id,
+                "confidence": confidence,
+                "worker": WORKER_ID,
+                "ts": time.time()
             }, ensure_ascii=False) + "\n")
             out.flush()
+
     with state_lock:
         state["current_index"] = max(state["current_index"], end + 1)
         save_state()

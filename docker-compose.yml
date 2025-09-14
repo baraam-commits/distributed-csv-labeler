@@ -1,59 +1,63 @@
-version: "3.8"
-
-x-common: &node-common
-  build: .
-  image: p2p-labeler:latest
-  restart: unless-stopped
-  volumes:
-    - ./data:/data:ro
-    - ./output:/output
-    - ./replicated:/replicated
-    - ./state:/state
-  environment:
-    HEARTBEAT_SEC: "1.0"
-    STALE_SEC: "5.0"
-    BATCH: "128"
-    REPL_INTERVAL: "10.0"
+version: "3.9"
 
 services:
   node1:
-    <<: *node-common
+    build: .
     container_name: node1
-    command: >
-      python -u /app/app/node.py
-      --mode auto
-      --prefer-leader
-      --csv /data/questions.csv
-      --port 8001
-      --peers node1:8001,node2:8002,node3:8003
-      --worker-id node1
-      --batch 128
-    ports: ["8001:8001"]
+    restart: unless-stopped
+    environment:
+      WORKER_ID: "node1"
+      PORT: 8001
+      MODE: "auto"
+      PEERS: "node1:8001,node2:8002,node3:8003"
+      BATCH: 128
+      # override on Linux host: OLLAMA_URL=http://192.168.x.y:11434
+      OLLAMA_URL: "http://host.docker.internal:11434"
+    command: ["python","-u","/app/app/node.py","--csv","/data/questions.csv","--port","8001","--mode","auto","--prefer-leader"]
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/data:ro
+      - ./output:/output
+      - ./replicated:/replicated
+      - ./state:/state
 
   node2:
-    <<: *node-common
+    build: .
     container_name: node2
-    command: >
-      python -u /app/app/node.py
-      --mode auto
-      --csv /data/questions.csv
-      --port 8002
-      --peers node1:8001,node2:8002,node3:8003
-      --worker-id node2
-      --batch 128
-    ports: ["8002:8002"]
-    depends_on: [node1]
+    restart: unless-stopped
+    environment:
+      WORKER_ID: "node2"
+      PORT: 8002
+      MODE: "auto"
+      PEERS: "node1:8001,node2:8002,node3:8003"
+      BATCH: 128
+      OLLAMA_URL: "http://host.docker.internal:11434"
+    command: ["python","-u","/app/app/node.py","--csv","/data/questions.csv","--port","8002","--mode","auto"]
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./data:/data:ro
+      - ./output:/output
+      - ./replicated:/replicated
+      - ./state:/state
 
   node3:
-    <<: *node-common
+    build: .
     container_name: node3
-    command: >
-      python -u /app/app/node.py
-      --mode auto
-      --csv /data/questions.csv
-      --port 8003
-      --peers node1:8001,node2:8002,node3:8003
-      --worker-id node3
-      --batch 128
-    ports: ["8003:8003"]
-    depends_on: [node1]
+    restart: unless-stopped
+    environment:
+      WORKER_ID: "node3"
+      PORT: 8003
+      MODE: "auto"
+      PEERS: "node1:8001,node2:8002,node3:8003"
+      BATCH: 128
+      OLLAMA_URL: "http://host.docker.internal:11434"
+    command: ["python","-u","/app/app/node.py","--csv","/data/questions.csv","--port","8003","--mode","auto"]
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./data:/data:ro
+      - ./output:/output
+      - ./replicated:/replicated
+      - ./state:/state
