@@ -1,0 +1,43 @@
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# Python environment
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# Git
+.git/
+.gitignore
+
+# Misc
+*.log
+*.sqlite3
+*.db
+.DS_Store
+Thumbs.db
+*.bak
+*.swp
+*.tmp

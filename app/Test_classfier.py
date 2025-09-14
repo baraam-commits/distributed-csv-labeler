@@ -119,6 +119,7 @@ def _flatten_labeled_data(labeled) -> list:
     return items
 
 def _test_model(model, system_prompt: Optional[str] = None, options: Optional[dict] = None, labeled_data: Optional[dict] = labeled_questions, gpu: bool = False) -> dict:
+        
     print("\n\n\n\n")
     args = []
     if model is not None:
@@ -317,7 +318,6 @@ def _test_model(model, system_prompt: Optional[str] = None, options: Optional[di
         "avg_abs_delta_conf_overall": overall_avg_abs_delta,
         "domains": domain_metrics,
     }
-
 
 def _append_metrics_csv(csv_path: str, metrics: dict, fieldnames: list = CSV_HEADERS) -> None:
     # Ensure directory exists
@@ -576,5 +576,5 @@ def log_discrepancies(
         
 
 # log_discrepancies()
-_test_model("qwen2.5:0.5b-instruct", gpu=True)
+# _test_model("qwen2.5:0.5b-instruct", gpu=True)
 # _test_model("gemma3:270m", gpu=True)

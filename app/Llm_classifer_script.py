@@ -122,7 +122,7 @@ DEFAULT_MODEL = "qwen2.5:0.5b-instruct"
 class llmClassifier:
     def __init__(self, model: str = DEFAULT_MODEL, system_prompt: str = DEFAULT_SYSTEM_PROMPT,
                     options: dict = DEFAULT_OPTIONS, gpu: Optional[str] = False,
-                    calib_path: str = "calibrators.json"):
+                    calib_path: str = r"app/app_data/Calibration_data/calibrators.json"):
         self.model = model
         self.system_prompt = system_prompt
         self.options = options or {}

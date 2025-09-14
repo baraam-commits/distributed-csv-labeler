@@ -257,6 +257,7 @@ def process_range(start: int, end: int):
             # TODO: replace with your real LLM/rules
             label = "search" if ("?" in txt or any(k in txt.lower() for k in [" who"," when"," where"," what"," define "])) else "no-search"
             conf = 0.9 if label == "search" else 0.8
+            
             out.write(json.dumps({
                 "id": rec["id"], "idx": idx,
                 "label": label, "confidence": conf,

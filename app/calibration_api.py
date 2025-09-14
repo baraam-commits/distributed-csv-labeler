@@ -315,7 +315,7 @@ def _fit_select_one(p, y):
 # ---------- high-level API ----------
 def auto_fit_and_save(
     domain_to_csv: dict[str, str],
-    out_path: str = "calibrators.json",
+    out_path: str = r"app/app_data/Calibration_data/calibrators.json",
     prob_col: str = "confidence",
     label_col: str = "search_needed",
     pred_label_col: str | None = None,
