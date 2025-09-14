@@ -208,3 +208,14 @@ __marimo__/
 
 #vscode
 .vscode/
+# Docker
+*.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+.docker/
+docker/
+docker-compose.*
+docker.env
+.docker.env
+.docker-compose/
