@@ -219,3 +219,4 @@ docker-compose.*
 docker.env
 .docker.env
 .docker-compose/
+.env

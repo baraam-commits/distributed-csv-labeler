@@ -67,8 +67,22 @@ try:
 except FileNotFoundError:
     print(f"CSV not found at {CSV_PATH}", file=sys.stderr); sys.exit(1)
 
+# after loading CSV_PATH, before "loaded N rows" print:
+import hashlib
+
+def _sha1_file(path):
+    h = hashlib.sha1()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024*1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+CSV_SHA1 = _sha1_file(CSV_PATH)
+
+
 N = len(DATA)
 print(f"[{WORKER_ID}] loaded {N} rows (domain col present: {has_domain})")
+print(f"[{WORKER_ID}] CSV path={CSV_PATH} sha1={CSV_SHA1} rows={N}")
 
 # -------------- State -----------------------------
 state_lock = threading.Lock()
@@ -133,6 +147,26 @@ class ClaimResp(BaseModel):
 
 # -------------- FastAPI app -----------------------
 app = FastAPI()
+
+@app.get("/peers")
+def peers():
+    now = time.time()
+    alive = {wid: st.dict() for wid, st in peer_status.items() if now - st.ts <= STALE_SEC}
+    with state_lock:
+        me = Status(worker_id=state["worker_id"], current_index=state["current_index"],
+                    epoch=state["epoch"], leader=state["leader"], ts=time.time()).dict()
+    return {"me": me, "alive": alive, "peers_list": PEERS}
+
+@app.get("/progress")
+def progress():
+    now = time.time()
+    alive = [st.current_index for st in peer_status.values() if now - st.ts <= STALE_SEC]
+    with state_lock:
+        my_idx = state["current_index"]
+    all_idx = alive + [my_idx]
+    max_idx = max(all_idx) if all_idx else my_idx
+    pct = (max_idx / max(1, N)) * 100.0
+    return {"rows_total": N, "max_current_index": max_idx, "percent_done": round(pct, 2)}
 
 @app.get("/ping")
 def ping():

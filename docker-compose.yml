@@ -1,3 +1,4 @@
+# For tesing on one windows machine
 version: "3.9"
 
 services:
@@ -5,7 +6,11 @@ services:
     build: .
     container_name: node1
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
+      DATA_PATH: ${DATA_PATH}
+      NODE_ROLE: ${NODE_ROLE}
       WORKER_ID: "node1"
       PORT: 8001
       MODE: "auto"
@@ -26,7 +31,11 @@ services:
     build: .
     container_name: node2
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
+      DATA_PATH: ${DATA_PATH}
+      NODE_ROLE: ${NODE_ROLE}
       WORKER_ID: "node2"
       PORT: 8002
       MODE: "auto"
@@ -46,7 +55,11 @@ services:
     build: .
     container_name: node3
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
+      DATA_PATH: ${DATA_PATH}
+      NODE_ROLE: ${NODE_ROLE}
       WORKER_ID: "node3"
       PORT: 8003
       MODE: "auto"
@@ -61,3 +74,31 @@ services:
       - ./output:/output
       - ./replicated:/replicated
       - ./state:/state
+
+# For production on linux, only one node (ip adresses of other nodes needed)
+
+# version: "3.9"
+
+# services:
+#   node:
+#     image: bert-classifier-node:latest   # or build: .
+#     container_name: node
+#     restart: unless-stopped
+#     env_file:
+#       - .env
+#     network_mode: host                   # <- Linux-only; shares host network
+#     environment:
+#       WORKER_ID: ${WORKER_ID}
+#       PORT: ${PORT}
+#       PREFER_LEADER: ${PREFER_LEADER:-false}
+#       MODE: "auto"
+#       PEERS: "${PEERS}"                  # comma-separated LAN_IP:PORT of all nodes
+#       CSV: "/data/questions.csv"
+#       OLLAMA_URL: "http://127.0.0.1:11434"  # host & container share network
+#     command: ["python","-u","/app/app/node.py","--csv","/data/questions.csv","--port","${PORT:-8001}","--mode","auto","--prefer-leader"]
+#     volumes:
+#       - ./data:/data:ro
+#       - ./output:/output
+#       - ./replicated:/replicated
+#       - ./state:/state
+

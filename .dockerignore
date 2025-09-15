@@ -1,43 +1,51 @@
-# VS Code settings
+# Bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# VS Code and IDE junk
 .vscode/
 *.code-workspace
+.idea/
 
-# Python environment
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.env
-*.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
-
-# Distribution / packaging
+# Build artifacts
 build/
 dist/
 *.egg-info/
 .eggs/
-*.manifest
-*.spec
+
+# Python envs
+*.env
+*.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs & temp files
+*.log
+*.sqlite3
+*.db
+*.bak
+*.swp
+*.tmp
 
 # Git
 .git/
 .gitignore
 
-# Misc
-*.log
-*.sqlite3
-*.db
-.DS_Store
-Thumbs.db
-*.bak
-*.swp
-*.tmp
+# Jupyter
+.ipynb_checkpoints
+
+# -------- Project-specific --------
+# Don’t send big generated outputs into the Docker build
+/output/*
+/replicated/*
+/state/*
+
+# Keep calibration data & code
+!app/app_data/**
