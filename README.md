@@ -1,4 +1,3 @@
-# distributed-csv-labeler
 # Distributed BERT Labeler
 
 A distributed, fault-tolerant pipeline for labeling large datasets to train a BERT classifier.  
@@ -30,3 +29,6 @@ state/ # Node state (progress, leader info, CSV index)
 Dockerfile # Container definition
 docker-compose.yml # Multi-node local test harness
 merge_results.py # Final dedup + merge script
+
+## Project report 
+Available in repository under the name Engineering a Robust Search Classification Pipeline for an Offline Retrieval-Augmented Chatbot
