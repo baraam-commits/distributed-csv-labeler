@@ -1,4 +1,4 @@
-# Distributed BERT Labeler
+# Distributed LLM Labeler
 
 A distributed, fault-tolerant pipeline for labeling large datasets to train a BERT classifier.  
 Built with **FastAPI**, **Docker**, and **peer-to-peer shard replication**, this system can scale across multiple machines on a local network and automatically recover from node crashes.
