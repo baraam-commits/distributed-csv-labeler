@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baraa — Offline LLM Project Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .card { border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06) }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace }
+    .tabnums { font-variant-numeric: tabular-nums }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-white to-gray-50 text-gray-900">
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <header class="mb-6">
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight">
+        Project Overview: Offline LLM + Wikipedia RAG / Distributed Labeling / Calibration / Benchmarks
+      </h1>
+      <p class="mt-3 max-w-3xl text-gray-700">
+        Skim-first portfolio distilled from the engineering report. Sections mirror the report and call out numbers, methods, and figures.
+      </p>
+      <div class="mt-4 text-xs text-gray-600 border rounded-lg p-3 bg-white/60">
+        <strong>Note:</strong> Sections mirror the original engineering report. For depth, open the full PDF in the repo:
+        <a class="underline" id="reportLink" href="#" target="_blank" rel="noreferrer">Open report</a>.
+      </div>
+      <div class="mt-6 flex flex-wrap gap-3 items-center">
+        <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm bg-gray-100 hover:bg-gray-200"
+           id="emailLink" href="#">Email</a>
+        <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm bg-gray-100 hover:bg-gray-200"
+           id="githubLink" href="#" target="_blank" rel="noreferrer">GitHub</a>
+        <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm bg-gray-100 hover:bg-gray-200"
+           id="linkedinLink" href="#" target="_blank" rel="noreferrer">LinkedIn</a>
+        <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm bg-gray-100 hover:bg-gray-200"
+           id="resumeLink" href="#" target="_blank" rel="noreferrer">Resume</a>
+      </div>
+    </header>
+
+    <!-- 1) Mandate & System Architecture -->
+    <section class="card bg-white p-5 mb-6">
+      <div class="flex items-center gap-2 mb-2">
+        <h2 class="text-lg font-semibold">1) Project Mandate & System Architecture</h2>
+      </div>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">
+        Privacy-first, fully offline chatbot on local hardware. Local retrieval plus calibrated labeling delivers accuracy without a cloud dependency.
+      </p>
+      <ul class="text-sm list-disc pl-5 space-y-1">
+        <li>Goal: private, fully offline chatbot; replace brittle web-scraping with local retrieval.</li>
+        <li>Constraint: CPU-bound consumer hardware; reliability prioritized over tricks.</li>
+        <li>Architecture: Local LLM + offline Wikipedia index (SQL/FAISS) and orchestration for labeling/inference.</li>
+      </ul>
+
+      <div class="mt-4 border rounded-lg p-4 bg-white/50">
+        <div class="text-sm font-semibold mb-2">Executive Summary</div>
+        <p class="text-sm text-gray-700">
+          This project builds a reliable, private, fully offline chatbot that answers queries with no internet access. It guarantees privacy by running on local hardware while maintaining accuracy and efficiency.
+        </p>
+        <ol class="mt-2 text-sm list-decimal pl-5 space-y-1">
+          <li>Dynamic Search Classification: a custom classifier decides when external lookup is needed, balancing speed with factual accuracy.</li>
+          <li>Confidence Calibration Pipeline: a multi-stage process converts noisy lightweight-model outputs into trustworthy, reusable training data.</li>
+          <li>Distributed Labeling and fine-tuned BERT: a fault-tolerant system labeled and audited 200k+ examples; the BERT classifier reached about 90% accuracy in its first epoch.</li>
+        </ol>
+        <p class="mt-2 text-sm text-gray-700">
+          Together, these parts form a blueprint for data-centric AI that is performant, robust across domains, and resilient under real-world constraints.
+        </p>
+      </div>
+
+      <figure class="border rounded-xl p-3 bg-white mt-4">
+        <div class="text-xs mb-2 text-gray-700">System Flow (optional diagram)</div>
+        <img src="images/fig_architecture.png" alt="System Flow" class="rounded-md"
+             onerror="this.style.opacity='0.5'; this.alt='Place images/fig_architecture.png';" />
+        <figcaption class="mt-2 text-xs text-gray-500">Drop file at <code class="bg-gray-50 px-1 py-0.5 rounded border">docs/images/fig_architecture.png</code></figcaption>
+      </figure>
+    </section>
+
+    <!-- 2) Query Classification Pipeline -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">2) System Architecture — Query Classification Pipeline</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">User query -&gt; preprocessing -&gt; search-needed classifier. Deterministic path keeps latency low and privacy intact.</p>
+      <ul class="text-sm list-disc pl-5 space-y-1">
+        <li>User query input -&gt; normalization and entity extraction -&gt; classification: {search_needed, confidence}.</li>
+        <li>Preprocessing: spaCy tokenization and NER; length and punctuation normalization; safe truncation for short text.</li>
+        <li>Classifier is the gatekeeper: search triggers offline retrieval; no-search routes directly to LLM response.</li>
+      </ul>
+
+      <figure class="border rounded-xl p-3 bg-white mt-4">
+        <div class="text-xs mb-2 text-gray-700">Query Pipeline Flowchart</div>
+        <img src="images/fig_query_pipeline.png" alt="Query flowchart" class="rounded-md"
+             onerror="this.style.opacity='0.5'; this.alt='Place images/fig_query_pipeline.png';" />
+        <figcaption class="mt-2 text-xs text-gray-500">Drop file at <code class="bg-gray-50 px-1 py-0.5 rounded border">docs/images/fig_query_pipeline.png</code></figcaption>
+      </figure>
+
+      <div class="mt-3 text-xs mono whitespace-pre-wrap border rounded-lg p-3 bg-gray-50">
+        <div class="font-semibold mb-1">Text Walkthrough (no graphic)</div>
+[User Query]
+  |
+  v
+[Preprocess] - normalize, tokenize, NER (spaCy), strip noise, cap length
+  |
+  v
+[Classifier] -> outputs { search_needed in {0,1}, confidence in [0,1] }
+  |-- search_needed = 1 -> [Retrieve (Offline Wikipedia)] -> [Summarize] -> [LLM Answer]
+  |-- search_needed = 0 -> [LLM Answer (direct)]
+      </div>
+    </section>
+
+    <!-- 2.1-2.3 Early iterations -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">2.1–2.3) Early Iterations and Expansion into Transformers</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">Traditional baselines underfit; BERT chosen for bidirectional context, calibration stability, and CPU-friendly latency.</p>
+      <ul class="text-sm list-disc pl-5 space-y-1">
+        <li>Rules/heuristics brittle on phrasing; TF-IDF models weak on semantics; RNN/CNN struggled with long dependencies.</li>
+        <li>Baselines produced unstable confidence => poor thresholding; transformers offered richer features and better-studied calibration.</li>
+        <li>BERT balanced accuracy, latency, and tooling better than small XLNet/ELECTRA/DeBERTa/T5 alternatives.</li>
+      </ul>
+      <div class="mt-3 text-xs mono whitespace-pre-wrap border rounded-lg p-3 bg-gray-50">
+Rules/Heuristics  -> brittle; fails on paraphrase
+TF-IDF + LogReg   -> weak semantics; high FP
+RNN/CNN           -> long-dependency issues
+BERT (bi-transformer) -> stronger context both directions; calibration literature; OK CPU latency
+      </div>
+    </section>
+
+    <!-- 2.4 Processing for BERT -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">2.4) Processing Input for BERT Classification</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">spaCy plus rules yield clean, consistent short-text inputs. Sequence constraints avoid truncation artifacts.</p>
+      <ul class="text-sm list-disc pl-5 space-y-1">
+        <li>Tools: spaCy for tokenization and NER; lightweight normalization.</li>
+        <li>Steps: normalization (case/whitespace/punctuation), entity tagging, sequence length management (truncate or pad).</li>
+        <li>Dependency parsing informs entity grouping for ambiguous multi-span queries.</li>
+      </ul>
+      <div class="mt-3 text-xs mono whitespace-pre-wrap border rounded-lg p-3 bg-gray-50">
+Normalize -> strip odd unicode, collapse whitespace, fix quotes
+spaCy -> tokenize, NER (ORG/LOC/DATE/NUM), dependency heads
+Sequence policy -> max_len N; keep salient entities intact; pad or truncate safely
+      </div>
+    </section>
+
+    <!-- 3) Phase 1 Data sources + pie -->
+    <section class="card bg-white p-5 mb-6" id="phase1">
+      <h2 class="text-lg font-semibold mb-1">3) Phase 1 — Data Sources and Labeling Strategy</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">Diverse corpora plus exported user history provide scale and realism; hard rules inject domain priors.</p>
+      <ul class="text-sm list-disc pl-5 space-y-1">
+        <li>Goal: tens of thousands of examples with calibrated confidences for BERT training.</li>
+        <li>External sources: Wikipedia Q-sets, medical journals, Stack Overflow programming Q/A.</li>
+        <li>Exported user history: real queries with typos and entities; streamed extraction (CSV or JSON).</li>
+        <li>Labeling rules: Medical -> always search; Math -> always no search. Misc reasoning intent often labeled no search.</li>
+      </ul>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-[220px,1fr] gap-4">
+        <div class="flex items-center justify-center">
+          <svg id="pie" width="200" height="200" viewBox="0 0 200 200" class="drop-shadow-sm"></svg>
+        </div>
+        <div>
+          <div class="text-xs mb-2 text-gray-700">Dataset composition (approximate)</div>
+          <ul id="pieLegend" class="text-sm grid grid-cols-1 sm:grid-cols-2 gap-2"></ul>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto border rounded-xl bg-white mt-4">
+        <div class="text-xs px-3 py-2 text-gray-600 border-b">Dataset Composition (approximate counts)</div>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="text-left px-3 py-2 border-b">Source</th>
+              <th class="text-left px-3 py-2 border-b">Count</th>
+              <th class="text-left px-3 py-2 border-b">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="dsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3.2-3.5 Findings + graphs -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">3.2–3.5) Selecting LLMs for Data Labeling and Testing Results</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">Qwen2.5 0.5b instruct selected. Discrepancies reduced to 15/60 via prompt tweaks; calibration still required.</p>
+      <div class="overflow-x-auto border rounded-xl bg-white">
+        <div class="text-xs px-3 py-2 text-gray-600 border-b">Summary of Findings (from report)</div>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="text-left px-3 py-2 border-b">Model</th>
+              <th class="text-left px-3 py-2 border-b">Params</th>
+              <th class="text-left px-3 py-2 border-b">Avg Latency (s)</th>
+              <th class="text-left px-3 py-2 border-b">CPU Profile</th>
+              <th class="text-left px-3 py-2 border-b">Confidence Behavior</th>
+              <th class="text-left px-3 py-2 border-b">Avg Discrepancies</th>
+              <th class="text-left px-3 py-2 border-b">Domain Strengths</th>
+              <th class="text-left px-3 py-2 border-b">Domain Weaknesses</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Qwen2.5 0.5b instruct</td><td class="px-3 py-2">0.5B</td><td class="px-3 py-2">~0.6</td><td class="px-3 py-2">Stable, low CPU</td><td class="px-3 py-2">Overconfident but consistent</td><td class="px-3 py-2">~25 → 15 (after prompt)</td><td class="px-3 py-2">Programming, general</td><td class="px-3 py-2">Math; some health edge cases</td></tr>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Granite3.3 2b</td><td class="px-3 py-2">2.0B</td><td class="px-3 py-2">~2.2</td><td class="px-3 py-2">High CPU</td><td class="px-3 py-2">Inflated (~0.95)</td><td class="px-3 py-2">~21</td><td class="px-3 py-2">Math, stable</td><td class="px-3 py-2">Latency high on CPU</td></tr>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Phi-4 mini 3.8B</td><td class="px-3 py-2">3.8B</td><td class="px-3 py-2">~2.6</td><td class="px-3 py-2">Very high CPU</td><td class="px-3 py-2">Overconfident</td><td class="px-3 py-2">~27</td><td class="px-3 py-2">Nuanced reasoning</td><td class="px-3 py-2">Slow; memory demand</td></tr>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Llama3.2 1b</td><td class="px-3 py-2">1.0B</td><td class="px-3 py-2">~1.2</td><td class="px-3 py-2">Moderate CPU</td><td class="px-3 py-2">Mod. overconfident</td><td class="px-3 py-2">~29</td><td class="px-3 py-2">Mental health</td><td class="px-3 py-2">Weaker math/programming</td></tr>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Falcon 3.1b</td><td class="px-3 py-2">1.0B</td><td class="px-3 py-2">~1.5</td><td class="px-3 py-2">Spiky CPU</td><td class="px-3 py-2">Overconfident</td><td class="px-3 py-2">~39</td><td class="px-3 py-2">-</td><td class="px-3 py-2">Schema issues</td></tr>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Granite3.1-moe 1b</td><td class="px-3 py-2">1.0B</td><td class="px-3 py-2">~1.1</td><td class="px-3 py-2">Low CPU</td><td class="px-3 py-2">Unstable</td><td class="px-3 py-2">~32</td><td class="px-3 py-2">Short factual (occasional)</td><td class="px-3 py-2">Unstable across domains</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <figure class="border rounded-xl p-3 bg-white">
+          <div class="text-xs mb-2 text-gray-700">Figure 1 — Average Discrepancies per Model</div>
+          <img src="images/discrepancies.png" class="rounded-md" alt="Discrepancies"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/discrepancies.png';">
+        </figure>
+        <figure class="border rounded-xl p-3 bg-white">
+          <div class="text-xs mb-2 text-gray-700">Figure 2 — Latency vs CPU Time per Model</div>
+          <img src="images/latency.png" class="rounded-md" alt="Latency vs CPU"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/latency.png';">
+        </figure>
+        <figure class="border rounded-xl p-3 bg-white">
+          <div class="text-xs mb-2 text-gray-700">Figure 3 — Avg Confidence vs Avg Discrepancies</div>
+          <img src="images/confidence.png" class="rounded-md" alt="Confidence vs Discrepancies"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/confidence.png';">
+        </figure>
+        <figure class="border rounded-xl p-3 bg-white">
+          <div class="text-xs mb-2 text-gray-700">Figure 4 — Domain-Level Discrepancy (stacked)</div>
+          <img src="images/domain_discrepancy.png" class="rounded-md" alt="Domain discrepancy"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/domain_discrepancy.png';">
+        </figure>
+      </div>
+    </section>
+
+    <!-- 4) Calibration -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">4) Phase 2 — Multi-Stage Calibration Pipeline</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">Shrinkage + down-only temperature scaling + guardrails -> calibrated confidences (~0.71–0.73 avg).</p>
+      <div class="overflow-x-auto border rounded-xl bg-white">
+        <div class="text-xs px-3 py-2 text-gray-600 border-b">Raw vs Calibrated Confidence (report)</div>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50"><th class="text-left px-3 py-2 border-b">Domain</th><th class="text-left px-3 py-2 border-b">Raw Avg</th><th class="text-left px-3 py-2 border-b">Calibrated Avg</th></tr>
+          </thead>
+          <tbody>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Programming</td><td class="px-3 py-2">~0.85</td><td class="px-3 py-2">~0.732</td></tr>
+            <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">General</td><td class="px-3 py-2">~0.80</td><td class="px-3 py-2">~0.712</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5) Scaling -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">5) Phase 3 — Production-Grade Scaling (FastAPI + Docker)</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">Linear scaling, durable replication, quick failover. Telemetry surfaces bottlenecks on commodity hardware.</p>
+      <div class="overflow-x-auto border rounded-xl bg-white">
+        <div class="text-xs px-3 py-2 text-gray-600 border-b">Throughput and Reliability (from report)</div>
+        <table class="w-full text-sm">
+          <thead><tr class="bg-gray-50"><th class="text-left px-3 py-2 border-b">Metric</th><th class="text-left px-3 py-2 border-b">Value</th><th class="text-left px-3 py-2 border-b">Notes</th></tr></thead>
+        <tbody>
+          <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Datapoints processed</td><td class="px-3 py-2">~327k</td><td class="px-3 py-2">~20 hours</td></tr>
+          <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Leader failover</td><td class="px-3 py-2">&lt;2s</td><td class="px-3 py-2">Lease-based</td></tr>
+          <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Scaling</td><td class="px-3 py-2">Near-linear</td><td class="px-3 py-2">Replication later bottleneck</td></tr>
+          <tr class="odd:bg-white even:bg-gray-50"><td class="px-3 py-2">Durability</td><td class="px-3 py-2">2x replica acks</td><td class="px-3 py-2">No single-node loss</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5.3 Results -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">5.3) Results — Dataset Quality Insights</h2>
+      <ul class="text-sm list-disc pl-5 space-y-1 mb-3">
+        <li>Confidence distribution by domain aligns with expected difficulty after calibration.</li>
+        <li>Domain-aware stratification highlights where search decisions cluster (e.g., medical).</li>
+        <li>Text length by label: search trends longer/denser (entity-rich).</li>
+      </ul>
+      <div class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <figure class="border rounded-xl p-3 bg-white">
+          <div class="text-xs mb-2 text-gray-700">Confidence Distribution by Domain</div>
+          <img src="images/fig_conf_by_domain.png" class="rounded-md" alt="Confidence by domain"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/fig_conf_by_domain.png';">
+        </figure>
+        <figure class="border rounded-xl p-3 bg-white">
+          <div class="text-xs mb-2 text-gray-700">Domain-Aware Stratification</div>
+          <img src="images/fig_domain_stratification.png" class="rounded-md" alt="Domain stratification"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/fig_domain_stratification.png';">
+        </figure>
+        <figure class="border rounded-xl p-3 bg-white md:col-span-2">
+          <div class="text-xs mb-2 text-gray-700">Text Length by Label</div>
+          <img src="images/fig_text_length_by_label.png" class="rounded-md" alt="Text length by label"
+               onerror="this.style.opacity='0.5'; this.alt='Place images/fig_text_length_by_label.png';">
+        </figure>
+      </div>
+    </section>
+
+    <!-- 6) Fine-tuning -->
+    <section class="card bg-white p-5 mb-6">
+      <h2 class="text-lg font-semibold mb-1">6) Phase 4 — Fine-Tuning the BERT Classifier</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">Binary classifier hit about 90% in 1 epoch; next: confidence-aware training for graded decisions.</p>
+      <div class="mt-3 text-xs mono whitespace-pre-wrap border rounded-lg p-3 bg-gray-50">
+Epochs: 1 -> 3 -> 5 (projected)
+Accuracy: 0.90 -> 0.92 -> 0.93 (with more data + curriculum + confidence-aware loss)
+      </div>
+    </section>
+
+    <footer class="text-sm text-gray-500 py-8">
+      &copy; <span id="year"></span> Baraa Mohaisen • Built for skim-speed; numbers up front.
+    </footer>
+  </main>
+
+  <script>
+    // ---- Configure your links here ----
+    document.getElementById("emailLink").href   = "mailto:mohaisenbaraa@gmail.com";
+    document.getElementById("githubLink").href  = "https://github.com/<your-handle>";
+    document.getElementById("linkedinLink").href= "https://www.linkedin.com/in/<your-handle>/";
+    document.getElementById("resumeLink").href  = "#";
+    document.getElementById("reportLink").href  = "./Engineering%20a%20Robust%20Search%20Classification%20Pipeline%20for%20an%20Offline%20Retrieval-Augmented%20Chatbot.pdf";
+
+    // ---- Year ----
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // ---- Dataset composition (pie + table) ----
+    const dataset = [
+      { label: "Wikipedia Q-sets", value: 30000 },
+      { label: "Medical journals", value: 16000 },
+      { label: "Stack Overflow", value: 16000 },
+      { label: "Exported user history", value: 280000 },
+      { label: "Misc (math and reasoning)", value: 6000 },
+    ];
+    const colors = ["#60a5fa","#34d399","#fbbf24","#f472b6","#a78bfa","#f87171","#10b981","#f59e0b"];
+    const total = dataset.reduce((s,d)=>s+d.value,0) || 1;
+
+    // table
+    const dsTbody = document.getElementById("dsTable");
+    dataset.forEach((d,i)=>{
+      const tr = document.createElement("tr");
+      tr.className = (i%2===0) ? "odd:bg-white" : "even:bg-gray-50";
+      tr.innerHTML = `
+        <td class="px-3 py-2">${d.label}</td>
+        <td class="px-3 py-2 tabnums">${d.value.toLocaleString()}</td>
+        <td class="px-3 py-2">${d.label.includes("Misc") ? "More reasoning intent; often labeled no search" :
+          d.label.includes("Exported") ? "Real-world phrasing, typos" :
+          d.label.includes("Medical") ? "Rule-labeled: search" :
+          d.label.includes("Stack Overflow") ? "Programming intents" : "Curated QA items"}</td>`;
+      dsTbody.appendChild(tr);
+    });
+
+    // legend
+    const pieLegend = document.getElementById("pieLegend");
+    dataset.forEach((d,i)=>{
+      const li = document.createElement("li");
+      const pct = (d.value/total)*100;
+      li.className = "flex items-center gap-2";
+      li.innerHTML = `<span class="inline-block w-3 h-3 rounded-sm" style="background:${colors[i%colors.length]}"></span>
+                      <span class="truncate">${d.label}</span>
+                      <span class="ml-auto tabnums text-gray-700">${pct>1?pct.toFixed(1):pct.toFixed(2)}%</span>`;
+      pieLegend.appendChild(li);
+    });
+
+    // pie
+    const pie = document.getElementById("pie");
+    const size = 200, cx = 100, cy = 100, r = 98;
+    let acc = 0;
+    dataset.forEach((d,i)=>{
+      const start = (acc/total)*Math.PI*2 - Math.PI/2;
+      acc += d.value;
+      const end = (acc/total)*Math.PI*2 - Math.PI/2;
+      const x1 = cx + r * Math.cos(start), y1 = cy + r * Math.sin(start);
+      const x2 = cx + r * Math.cos(end),   y2 = cy + r * Math.sin(end);
+      const large = (end-start) > Math.PI ? 1 : 0;
+      const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+      path.setAttribute("d", `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`);
+      path.setAttribute("fill", colors[i%colors.length]);
+      pie.appendChild(path);
+    });
+    const ring = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    ring.setAttribute("cx", cx); ring.setAttribute("cy", cy); ring.setAttribute("r", r);
+    ring.setAttribute("fill","transparent"); ring.setAttribute("stroke","rgba(0,0,0,0.04)");
+    pie.appendChild(ring);
+  </script>
+</body>
+</html>
