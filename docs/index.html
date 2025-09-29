@@ -110,7 +110,7 @@
       <p class="-mt-1 mb-2 text-sm text-gray-700">Traditional baselines underfit; BERT chosen for bidirectional context, calibration stability, and CPU-friendly latency.</p>
       <ul class="text-sm list-disc pl-5 space-y-1">
         <li>Rules/heuristics brittle on phrasing; TF-IDF models weak on semantics; RNN/CNN struggled with long dependencies.</li>
-        <li>Baselines produced unstable confidence => poor thresholding; transformers offered richer features and better-studied calibration.</li>
+        <li>Baselines produced unstable confidence =&gt; poor thresholding; transformers offered richer features and better-studied calibration.</li>
         <li>BERT balanced accuracy, latency, and tooling better than small XLNet/ELECTRA/DeBERTa/T5 alternatives.</li>
       </ul>
       <div class="mt-3 text-xs mono whitespace-pre-wrap border rounded-lg p-3 bg-gray-50">
@@ -130,11 +130,15 @@ BERT (bi-transformer) -> stronger context both directions; calibration literatur
         <li>Steps: normalization (case/whitespace/punctuation), entity tagging, sequence length management (truncate or pad).</li>
         <li>Dependency parsing informs entity grouping for ambiguous multi-span queries.</li>
       </ul>
-      <div class="mt-3 text-xs mono whitespace-pre-wrap border rounded-lg p-3 bg-gray-50">
-Normalize -> strip odd unicode, collapse whitespace, fix quotes
-spaCy -> tokenize, NER (ORG/LOC/DATE/NUM), dependency heads
-Sequence policy -> max_len N; keep salient entities intact; pad or truncate safely
-      </div>
+      <!-- Replaced ASCII block with image figure per instructions -->
+      <figure class="border rounded-xl p-3 bg-white mt-4">
+        <div class="text-xs mb-2 text-gray-700">Processing Pipeline (Input → spaCy → Normalization/NER → Seq. policy)</div>
+        <img src="images/fig_processing_for_bert.png" class="rounded-md" alt="Processing for BERT"
+             onerror="this.style.opacity='0.5'; this.alt='Place images/fig_processing_for_bert.png';">
+        <figcaption class="mt-2 text-xs text-gray-500">
+          Drop file at <code class="bg-gray-50 px-1 py-0.5 rounded border">docs/images/fig_processing_for_bert.png</code>
+        </figcaption>
+      </figure>
     </section>
 
     <!-- 3) Phase 1 Data sources + pie -->
@@ -182,7 +186,7 @@ Sequence policy -> max_len N; keep salient entities intact; pad or truncate safe
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50">
-              <th class="text-left px-3 py-2 border-b">Model</th>
+              <th class="text-left px-3 py-2 border-b">Model (4 bit Quantized)</th>
               <th class="text-left px-3 py-2 border-b">Params</th>
               <th class="text-left px-3 py-2 border-b">Avg Latency (s)</th>
               <th class="text-left px-3 py-2 border-b">CPU Profile</th>
@@ -231,6 +235,22 @@ Sequence policy -> max_len N; keep salient entities intact; pad or truncate safe
     <section class="card bg-white p-5 mb-6">
       <h2 class="text-lg font-semibold mb-1">4) Phase 2 — Multi-Stage Calibration Pipeline</h2>
       <p class="-mt-1 mb-2 text-sm text-gray-700">Shrinkage + down-only temperature scaling + guardrails -> calibrated confidences (~0.71–0.73 avg).</p>
+      <!-- Added bullets + flowchart image per instructions -->
+      <ul class="text-sm list-disc pl-5 space-y-1 mb-3">
+        <li>Shrinkage plus down-only temperature scaling and guardrails → calibrated confidences (~0.71–0.73 avg).</li>
+        <li>Shrinkage: per-domain gamma (Programming 2.9 → ~0.64 avg; General 1.8 → ~0.56).</li>
+        <li>Temperature scaling (T ≥ 1): decreases toward 0.5; never increases raw.</li>
+        <li>Guardrails: never-increase; preserve trivial 1.0; per-domain <code>calibrators.json</code>.</li>
+      </ul>
+      <figure class="border rounded-xl p-3 bg-white mt-2 mb-3">
+        <div class="text-xs mb-2 text-gray-700">Calibration Flow (Raw → Shrink → Temp-scale → Guardrails → Calibrated)</div>
+        <img src="images/fig_phase2_calibration.png" class="rounded-md" alt="Calibration flow"
+             onerror="this.style.opacity='0.5'; this.alt='Place images/fig_phase2_calibration.png';">
+        <figcaption class="mt-2 text-xs text-gray-500">
+          Drop file at <code class="bg-gray-50 px-1 py-0.5 rounded border">docs/images/fig_phase2_calibration.png</code>
+        </figcaption>
+      </figure>
+
       <div class="overflow-x-auto border rounded-xl bg-white">
         <div class="text-xs px-3 py-2 text-gray-600 border-b">Raw vs Calibrated Confidence (report)</div>
         <table class="w-full text-sm">
@@ -249,7 +269,25 @@ Sequence policy -> max_len N; keep salient entities intact; pad or truncate safe
     <section class="card bg-white p-5 mb-6">
       <h2 class="text-lg font-semibold mb-1">5) Phase 3 — Production-Grade Scaling (FastAPI + Docker)</h2>
       <p class="-mt-1 mb-2 text-sm text-gray-700">Linear scaling, durable replication, quick failover. Telemetry surfaces bottlenecks on commodity hardware.</p>
-      <div class="overflow-x-auto border rounded-xl bg-white">
+
+      <!-- Added bullets + flowchart image per instructions -->
+      <ul class="text-sm list-disc pl-5 space-y-1 mb-3">
+        <li>Linear scaling, durable replication, quick failover. Telemetry surfaces bottlenecks on commodity hardware.</li>
+        <li>FastAPI cluster: sharding, leases, leader election, 2-ack replication, reconciliation, crash safety.</li>
+        <li>Telemetry: per-node CPU/RAM/latency plus aggregated queue depth/throughput/backlog.</li>
+        <li>Linux-first Docker: single base image, host-mounted datasets, Ollama REST on host; Raspberry Pi head-node option.</li>
+      </ul>
+
+      <figure class="border rounded-xl p-3 bg-white mt-4">
+        <div class="text-xs mb-2 text-gray-700">Phase 3 Flowchart (Shards → Leases → Leader Election → Replication)</div>
+        <img src="images/fig_phase3_flow.png" class="rounded-md" alt="Phase 3 flow"
+             onerror="this.style.opacity='0.5'; this.alt='Place images/fig_phase3_flow.png';">
+        <figcaption class="mt-2 text-xs text-gray-500">
+          Drop file at <code class="bg-gray-50 px-1 py-0.5 rounded border">docs/images/fig_phase3_flow.png</code>
+        </figcaption>
+      </figure>
+
+      <div class="overflow-x-auto border rounded-xl bg-white mt-4">
         <div class="text-xs px-3 py-2 text-gray-600 border-b">Throughput and Reliability (from report)</div>
         <table class="w-full text-sm">
           <thead><tr class="bg-gray-50"><th class="text-left px-3 py-2 border-b">Metric</th><th class="text-left px-3 py-2 border-b">Value</th><th class="text-left px-3 py-2 border-b">Notes</th></tr></thead>
@@ -300,6 +338,30 @@ Accuracy: 0.90 -> 0.92 -> 0.93 (with more data + curriculum + confidence-aware l
       </div>
     </section>
 
+    <!-- 7) Conclusion and References (inserted right above footer) -->
+    <section class="card bg-white p-5 mb-6" id="conclusion">
+      <h2 class="text-lg font-semibold mb-1">7) Conclusion and References</h2>
+      <p class="-mt-1 mb-2 text-sm text-gray-700">
+        Multi-stage calibration turned inflated LLM confidence into dependable, relative probabilities; that shift enabled lightweight models to act as reliable auto-labelers and produced reusable training signals for downstream tasks. Docker + FastAPI orchestration scaled labeling beyond a single machine with sharding, leader election, and replication—achieving near-linear throughput and resilient failover on mixed hardware. The final BERT classifier validated the pipeline end-to-end, reaching ~90% (binary) in one epoch and delivering confidence-aware outputs that carry forward to stronger backbones (e.g., RoBERTa/DeBERTa) without changing the core architecture. The broader lesson: accuracy alone isn’t enough—reliability, privacy, and resilience are what make an offline system usable in the real world.
+      </p>
+      <ul class="text-sm list-disc pl-5 space-y-1">
+        <li><span class="font-medium">Taming Overconfidence:</span> shrinkage + down-only temperature scaling + guardrails yielded calibrated scores (~0.71–0.73 avg) that reflect uncertainty.</li>
+        <li><span class="font-medium">Scaling the Factory:</span> distributed labeling ran fault-tolerantly; nodes could fail without operator intervention.</li>
+        <li><span class="font-medium">Data-Driven Optimization:</span> the calibrated, audited dataset enabled the BERT gatekeeper to generalize quickly and expose trustworthy confidence.</li>
+        <li><span class="font-medium">What’s Next:</span> extend the same reliability bar to retrieval, summarization, and response generation within the offline chatbot.</li>
+      </ul>
+
+      <div class="mt-4 text-xs text-gray-600 border rounded-lg p-3 bg-white/60">
+        <div class="font-semibold mb-1">References</div>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Mohaisen, B. <em>Engineering a Robust Search Classification Pipeline for an Offline Retrieval-Augmented Chatbot</em>. 
+            <a class="underline" href="./Engineering%20a%20Robust%20Search%20Classification%20Pipeline%20for%20an%20Offline%20Retrieval-Augmented%20Chatbot.pdf" target="_blank" rel="noreferrer">PDF</a>
+          </li>
+          <li>Project repository: <a class="underline" href="https://github.com/&lt;your-username&gt;/&lt;your-repo&gt;" target="_blank" rel="noreferrer">GitHub</a></li>
+        </ul>
+      </div>
+    </section>
+
     <footer class="text-sm text-gray-500 py-8">
       &copy; <span id="year"></span> Baraa Mohaisen • Built for skim-speed; numbers up front.
     </footer>
@@ -308,10 +370,10 @@ Accuracy: 0.90 -> 0.92 -> 0.93 (with more data + curriculum + confidence-aware l
   <script>
     // ---- Configure your links here ----
     document.getElementById("emailLink").href   = "mailto:mohaisenbaraa@gmail.com";
-    document.getElementById("githubLink").href  = "https://github.com/<your-handle>";
-    document.getElementById("linkedinLink").href= "https://www.linkedin.com/in/<your-handle>/";
-    document.getElementById("resumeLink").href  = "#";
-    document.getElementById("reportLink").href  = "./Engineering%20a%20Robust%20Search%20Classification%20Pipeline%20for%20an%20Offline%20Retrieval-Augmented%20Chatbot.pdf";
+    document.getElementById("githubLink").href  = "https://github.com/baraam-commits";
+    document.getElementById("linkedinLink").href= "https://www.linkedin.com/in/baraa-mohaisen-46522b30a/";
+    document.getElementById("resumeLink").href  = "https://.../resume.pdf";
+    document.getElementById("reportLink").href  = "https://github.com/baraam-commits/distributed-csv-labeler/blob/8425fb67cff138eb4745e4c88008d00060ddabb9/Engineering%20a%20Robust%20Search%20Classification%20Pipeline%20for%20an%20Offline%20Retrieval-Augmented%20Chatbot.pdf";
 
     // ---- Year ----
     document.getElementById("year").textContent = new Date().getFullYear();
@@ -378,8 +440,4 @@ Accuracy: 0.90 -> 0.92 -> 0.93 (with more data + curriculum + confidence-aware l
 </body>
 </html>
 
-document.getElementById("githubLink").href  = "https://github.com/baraam-commits";
-document.getElementById("linkedinLink").href= "https://www.linkedin.com/in/baraa-mohaisen-46522b30a/";
-document.getElementById("resumeLink").href  = "https://.../resume.pdf";
-document.getElementById("reportLink").href  = ".Engineering a Robust Search Classification Pipeline for an Offline Retrieval-Augmented Chatbot.pdf";
 
