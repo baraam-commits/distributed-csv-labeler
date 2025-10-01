@@ -130,28 +130,51 @@ GET  /pull?name=   Stream a specific shard file
 
 ## License
 
-Copyright (c) 2025 Baraa Mohaisen
+Creative Commons Attribution-NonCommercial 4.0 International Public License
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to use, 
-copy, modify, and distribute the Software, subject to the following conditions:
+By exercising the Licensed Rights (defined below), You accept and agree to be bound 
+by the terms and conditions of this Creative Commons Attribution-NonCommercial 4.0 
+International Public License ("Public License"). To the extent this Public License 
+may be interpreted as a contract, You are granted the Licensed Rights in consideration 
+of Your acceptance of these terms and conditions, and the Licensor grants You such 
+rights in consideration of benefits the Licensor receives from making the Licensed 
+Material available under these terms and conditions.
 
-1. Attribution Required  
-   Any use of the Software, in whole or in part, must include proper credit to  
-   the original author: "Copyright (c) 2025 Baraa Mohaisen".  
+Section 1 – Definitions.
+a. Adapted Material means material subject to Copyright and Similar Rights that is 
+   derived from or based upon the Licensed Material and in which the Licensed Material 
+   is translated, altered, arranged, transformed, or otherwise modified in a manner 
+   requiring permission under the Copyright and Similar Rights held by the Licensor.
+b. Licensed Material means the artistic or literary work, database, or other material 
+   to which the Licensor applied this Public License.
+c. Licensed Rights means the rights granted to You subject to the terms and conditions 
+   of this Public License, which are limited to all Copyright and Similar Rights that 
+   apply to Your use of the Licensed Material and that the Licensor has authority to license.
+d. Licensor means the individual(s) or entity(ies) granting rights under this Public License.
+e. You means the individual or entity exercising the Licensed Rights under this Public License.
 
-2. Non-Commercial Use  
-   The Software may not be sold, licensed, or otherwise monetized in any form  
-   without prior written permission from the copyright holder.  
+Section 2 – Scope.
+a. License grant. Subject to the terms and conditions of this Public License, the Licensor 
+   hereby grants You a worldwide, royalty-free, non-sublicensable, non-exclusive, irrevocable 
+   license to exercise the Licensed Rights in the Licensed Material to:
+   i. reproduce and Share the Licensed Material, in whole or in part, for NonCommercial purposes only; and
+   ii. produce, reproduce, and Share Adapted Material for NonCommercial purposes only.
+b. Attribution. If You Share the Licensed Material (including in modified form), You must:
+   i. give appropriate credit to the Licensor, provide a link to the license, and indicate if changes were made; and
+   ii. not in any way suggest the Licensor endorses You or Your use.
+c. NonCommercial. You may not exercise the Licensed Rights in any manner that is primarily intended 
+   for or directed toward commercial advantage or monetary compensation.
 
-3. No Warranty  
-   The Software is provided "AS IS", without warranty of any kind, express or  
-   implied, including but not limited to the warranties of merchantability,  
-   fitness for a particular purpose and noninfringement. In no event shall the  
-   author or copyright holder be liable for any claim, damages, or other  
-   liability, whether in an action of contract, tort, or otherwise, arising from,  
-   out of, or in connection with the Software or the use or other dealings in  
-   the Software.
+Section 3 – Disclaimer of Warranties and Limitation of Liability.
+THE LICENSED MATERIAL IS PROVIDED “AS-IS” AND WITHOUT WARRANTIES OF ANY KIND. 
+TO THE GREATEST EXTENT PERMISSIBLE BY LAW, NEITHER THE LICENSOR NOR ITS AFFILIATES 
+SHALL BE LIABLE FOR ANY DAMAGES ARISING OUT OF THE USE OF THE LICENSED MATERIAL.
+
+Section 4 – Term and Termination.
+This Public License is effective as long as You comply with its terms. The Licensor 
+may terminate this license if You fail to do so. 
+
+For the full license text, see: https://creativecommons.org/licenses/by-nc/4.0/
 
 ---
 
