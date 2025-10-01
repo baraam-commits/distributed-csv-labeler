@@ -1,4 +1,4 @@
-# Distributed LLM Labeler & Offline Chatbot
+# Distributed LLM Labeler 
 
 A distributed, fault-tolerant labeling system and an offline retrieval-augmented chatbot.
 Built with FastAPI + Ollama + confidence calibration. Runs locally, scales across nodes, and
